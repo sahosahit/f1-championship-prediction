@@ -113,52 +113,69 @@ def extract_features(driver_history, total_rounds):
     """
     Extract normalized features from a driver's race-by-race history.
 
-    Features per time step (8 features):
+    Features per time step (12 features):
     1. points_normalized: CumulativePoints / max_possible_points_so_far
-    2. position_normalized: 1 - (ChampionshipPosition - 1) / 19  (higher = better)
+    2. position_normalized: 1 - (ChampionshipPosition - 1) / 19
     3. gap_normalized: PointsGapToLeader / max_possible_gap
-    4. win_rate: WinRate (already 0-1)
-    5. podium_rate: PodiumRate (already 0-1)
-    6. points_per_race_norm: PointsPerRace / 26 (max possible per race)
-    7. season_progress: Round / total_rounds (how far into season)
-    8. momentum: Change in points per race over last 3 races
+    4. win_rate: WinRate (0-1)
+    5. podium_rate: PodiumRate (0-1)
+    6. points_per_race_norm: PointsPerRace / 26
+    7. season_progress: Round / total_rounds
+    8. consistency: 1 - DNF rate
+    9. momentum: Change in PPR vs previous step (positive = improving)
+    10. is_leader: 1 if P1, 0 otherwise
+    11. points_share: Driver's points as fraction of total grid points
+    12. recent_form: Points scored in last 3 races / max possible in 3 races
     """
     features = []
+    max_points_per_race = 26
 
-    max_points_per_race = 26  # Max points for a win (25 + 1 fastest lap)
+    prev_ppr = None
+    prev_points = 0
 
     for idx, (_, row) in enumerate(driver_history.iterrows()):
         round_num = row['Round']
         races_completed = row['RacesCompleted']
-
-        # Max possible points at this stage
         max_possible = races_completed * max_points_per_race
 
-        # Feature vector for this time step
+        # Momentum: change in points per race vs previous time step
+        current_ppr = row['PointsPerRace']
+        if prev_ppr is not None:
+            momentum = (current_ppr - prev_ppr) / max_points_per_race
+        else:
+            momentum = 0.0
+        prev_ppr = current_ppr
+
+        # Recent form: points scored this race / max per race
+        points_this_race = row['CumulativePoints'] - prev_points
+        recent_form = points_this_race / max_points_per_race
+        prev_points = row['CumulativePoints']
+
         step_features = [
-            # 1. Points normalized (0-1, higher = more points)
+            # 1. Points normalized
             row['CumulativePoints'] / max_possible if max_possible > 0 else 0,
-
-            # 2. Position normalized (0-1, higher = better position)
+            # 2. Position normalized (higher = better)
             1 - (row['ChampionshipPosition'] - 1) / 19.0,
-
-            # 3. Gap to leader normalized (0-1, 0 = leader, 1 = far behind)
+            # 3. Gap to leader normalized (0 = leader)
             min(row['PointsGapToLeader'] / (max_possible * 0.5), 1.0) if max_possible > 0 else 0,
-
-            # 4. Win rate (0-1)
+            # 4. Win rate
             row['WinRate'],
-
-            # 5. Podium rate (0-1)
+            # 5. Podium rate
             row['PodiumRate'],
-
-            # 6. Points per race normalized (0-1)
+            # 6. Points per race normalized
             row['PointsPerRace'] / max_points_per_race,
-
-            # 7. Season progress (0-1)
+            # 7. Season progress
             round_num / total_rounds,
-
-            # 8. Consistency (inverse of DNF rate)
+            # 8. Consistency
             1 - (row['DNFs'] / races_completed if races_completed > 0 else 0),
+            # 9. Momentum (positive = improving form)
+            np.clip(momentum, -1, 1),
+            # 10. Is championship leader
+            1.0 if row['ChampionshipPosition'] == 1 else 0.0,
+            # 11. Points share (how much of available points this driver has)
+            row['CumulativePoints'] / (max_possible * 0.5) if max_possible > 0 else 0,
+            # 12. Recent form (this race's points / max)
+            recent_form,
         ]
 
         features.append(step_features)

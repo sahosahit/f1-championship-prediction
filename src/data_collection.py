@@ -8,6 +8,8 @@ import fastf1
 import pandas as pd
 import numpy as np
 import os
+import time
+import argparse
 
 # Setup directories
 CACHE_DIR = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'cache')
@@ -158,6 +160,7 @@ def collect_all_data(start_year=2014, end_year=2026):
                 log(f"  R{round_num:02d}: {event_name}... ")
 
                 results = get_race_results(year, round_num)
+                time.sleep(1)
 
                 if results is not None and not results.empty:
                     all_race_results.append(results)
@@ -232,4 +235,9 @@ def collect_all_data(start_year=2014, end_year=2026):
 
 
 if __name__ == "__main__":
-    collect_all_data(start_year=2014, end_year=2026)
+    parser = argparse.ArgumentParser(description='Collect F1 championship data')
+    parser.add_argument('--start', type=int, default=2014, help='Start year (default:2014)')
+    parser.add_argument('--end', type=int, default=2026, help='Start year (default:2026)')
+    args= parser.parse_args()
+
+    collect_all_data(start_year=args.start, end_year=args.end)

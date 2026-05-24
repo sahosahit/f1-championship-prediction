@@ -1,0 +1,11 @@
+cache/
+
+__pycahce__/
+*.pyc
+*.pyo
+.ipynb_checkpoints/
+
+models/*.pth
+
+venv/
+.venev/

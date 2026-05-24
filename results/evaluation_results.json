@@ -1,0 +1,84 @@
+{
+  "overall_accuracy": 0.6296296296296297,
+  "first_correct_rounds": [
+    4,
+    4,
+    16,
+    8,
+    7,
+    14,
+    22,
+    4,
+    4,
+    4
+  ],
+  "progress_accuracy": {
+    "Early (R4-R6)": 0.4166666666666667,
+    "Mid-Early (R7-R10)": 0.5625,
+    "Mid (R11-R14)": 0.6041666666666666,
+    "Mid-Late (R15-R18)": 0.723404255319149,
+    "Late (R19+)": 0.8378378378378378
+  },
+  "prediction_2026": [
+    {
+      "driver": "ANT",
+      "team": "Mercedes",
+      "points": 100.0,
+      "probability": 0.8334025144577026
+    },
+    {
+      "driver": "RUS",
+      "team": "Mercedes",
+      "points": 80.0,
+      "probability": 0.8324628472328186
+    },
+    {
+      "driver": "LEC",
+      "team": "Ferrari",
+      "points": 59.0,
+      "probability": 0.1397831290960312
+    },
+    {
+      "driver": "HAM",
+      "team": "Ferrari",
+      "points": 51.0,
+      "probability": 0.08359994739294052
+    },
+    {
+      "driver": "PIA",
+      "team": "McLaren",
+      "points": 43.0,
+      "probability": 0.05952232703566551
+    },
+    {
+      "driver": "NOR",
+      "team": "McLaren",
+      "points": 51.0,
+      "probability": 0.059506382793188095
+    },
+    {
+      "driver": "LAW",
+      "team": "Racing Bulls",
+      "points": 10.0,
+      "probability": 0.05835084617137909
+    },
+    {
+      "driver": "BEA",
+      "team": "Haas F1 Team",
+      "points": 17.0,
+      "probability": 0.05787054821848869
+    },
+    {
+      "driver": "VER",
+      "team": "Red Bull Racing",
+      "points": 26.0,
+      "probability": 0.0575384646654129
+    },
+    {
+      "driver": "GAS",
+      "team": "Alpine",
+      "points": 16.0,
+      "probability": 0.05658037215471268
+    }
+  ]
+}

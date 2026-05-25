@@ -221,37 +221,44 @@ def update_readme(predictions, round_num):
     readme_path = os.path.join(BASE_DIR, 'README.md')
 
     with open(readme_path, 'r') as f:
-        content = f.read()
+        lines = f.readlines()
+
+    # Find start and end markers by line
+    start_line = None
+    end_line = None
+    for i, line in enumerate(lines):
+        if '**2026 Prediction (After' in line:
+            start_line = i
+        if '**Model Performance:**' in line and start_line is not None:
+            end_line = i
+            break
+
+    if start_line is None or end_line is None:
+        print(f"WARNING: Could not find README markers (start={start_line}, end={end_line})")
+        return
 
     # Build new prediction table
     total_prob = sum(p['probability'] for p in predictions)
-    table_lines = [
-        f"\n**2026 Prediction (After {round_num} Races):**\n",
-        "| Driver | Team | Points | Championship Probability |",
-        "|--------|------|--------|--------------------------|",
+    new_lines = [
+        f"**2026 Prediction (After {round_num} Races):**\n",
+        "\n",
+        "| Driver | Team | Points | Championship Probability |\n",
+        "|--------|------|--------|--------------------------|"  + "\n",
     ]
     for p in predictions[:5]:
         norm = p['probability'] / total_prob * 100
-        table_lines.append(f"| {p['driver']} | {p['team']} | {p['points']:.0f} | {norm:.1f}% |")
+        new_lines.append(f"| {p['driver']} | {p['team']} | {p['points']:.0f} | {norm:.1f}% |\n")
 
     top_team = predictions[0]['team']
     team_prob = sum(p['probability']/total_prob*100 for p in predictions if p['team'] == top_team)
-    table_lines.append(f"\n**Model sees a {team_prob:.0f}% chance a {top_team} driver wins 2026.**")
+    new_lines.append(f"\n**Model sees a {team_prob:.0f}% chance a {top_team} driver wins 2026.**\n")
+    new_lines.append("\n")
 
-    new_table = "\n".join(table_lines)
-
-    # Replace existing prediction table
-    start_marker = "\n**2026 Prediction (After"
-    end_marker = "**Model Performance:**"
-
-    start_idx = content.find(start_marker)
-    end_idx = content.find(end_marker)
-
-    if start_idx != -1 and end_idx != -1:
-        content = content[:start_idx] + new_table + "\n\n" + content[end_idx:]
+    # Replace lines between markers
+    lines = lines[:start_line] + new_lines + lines[end_line:]
 
     with open(readme_path, 'w') as f:
-        f.write(content)
+        f.writelines(lines)
 
     print(f"Updated README.md with Round {round_num} predictions")
 

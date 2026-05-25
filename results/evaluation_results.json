@@ -21,64 +21,66 @@
   },
   "prediction_2026": [
     {
-      "driver": "ANT",
-      "team": "Mercedes",
-      "points": 100.0,
-      "probability": 0.8334025144577026
-    },
-    {
       "driver": "RUS",
       "team": "Mercedes",
-      "points": 80.0,
-      "probability": 0.8324628472328186
+      "points": 88.0,
+      "probability": 0.8812572956085205
+    },
+    {
+      "driver": "ANT",
+      "team": "Mercedes",
+      "points": 131.0,
+      "probability": 0.8764517307281494
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
-      "points": 59.0,
-      "probability": 0.1397831290960312
+      "points": 75.0,
+      "probability": 0.2613203823566437
     },
     {
       "driver": "HAM",
       "team": "Ferrari",
-      "points": 51.0,
-      "probability": 0.08359994739294052
-    },
-    {
-      "driver": "PIA",
-      "team": "McLaren",
-      "points": 43.0,
-      "probability": 0.05952232703566551
+      "points": 72.0,
+      "probability": 0.12714646756649017
     },
     {
       "driver": "NOR",
       "team": "McLaren",
-      "points": 51.0,
-      "probability": 0.059506382793188095
-    },
-    {
-      "driver": "LAW",
-      "team": "Racing Bulls",
-      "points": 10.0,
-      "probability": 0.05835084617137909
+      "points": 58.0,
+      "probability": 0.07141139358282089
     },
     {
       "driver": "BEA",
       "team": "Haas F1 Team",
-      "points": 17.0,
-      "probability": 0.05787054821848869
+      "points": 18.0,
+      "probability": 0.061716970056295395
     },
     {
       "driver": "VER",
-      "team": "Red Bull Racing",
-      "points": 26.0,
-      "probability": 0.0575384646654129
+      "team": "Red Bull",
+      "points": 43.0,
+      "probability": 0.060374245047569275
+    },
+    {
+      "driver": "PIA",
+      "team": "McLaren",
+      "points": 48.0,
+      "probability": 0.05932515859603882
     },
     {
       "driver": "GAS",
-      "team": "Alpine",
+      "team": "Alpine F1 Team",
+      "points": 20.0,
+      "probability": 0.05651690438389778
+    },
+    {
+      "driver": "LAW",
+      "team": "RB F1 Team",
       "points": 16.0,
-      "probability": 0.05658037215471268
+      "probability": 0.05567024275660515
     }
-  ]
+  ],
+  "last_updated": "2026-05-25T10:47:57.985180",
+  "prediction_round": 5
 }

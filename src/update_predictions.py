@@ -59,7 +59,7 @@ def check_for_new_race():
 
         if results is None or results.empty:
             print(f"Round {next_round}: No data available yet.")
-            return None, None
+            return None, None, None
 
         race_data = results[['DriverNumber', 'Abbreviation', 'TeamName',
                             'Position', 'Points', 'Status', 'GridPosition']].copy()
@@ -68,15 +68,28 @@ def check_for_new_race():
         race_data['EventName'] = session.event['EventName']
 
         print(f"Round {next_round} ({session.event['EventName']}): Found! {len(race_data)} drivers")
-        return next_round, race_data
+
+        # Check for sprint race
+        sprint_data = None
+        try:
+            sprint = fastf1.get_session(2026, next_round, 'S')
+            sprint.load(telemetry=False, weather=False, messages=False, laps=False)
+            sprint_results = sprint.results
+            if sprint_results is not None and not sprint_results.empty:
+                sprint_data = sprint_results[['Abbreviation', 'Points']].copy()
+                print(f"  Sprint race found! {len(sprint_data)} drivers")
+        except Exception:
+            print(f"  No sprint race for this round")
+
+        return next_round, race_data, sprint_data
 
     except Exception as e:
         print(f"Round {next_round}: Not available ({e})")
-        return None, None
+        return None, None, None
 
 
-def update_standings(new_race_data, new_round):
-    """Add new race results to championship standings."""
+def update_standings(new_race_data, new_round, sprint_data=None):
+    """Add new race + sprint results to championship standings."""
     standings = pd.read_csv(os.path.join(DATA_DIR, 'championship_standings.csv'))
 
     # Get previous 2026 standings to calculate cumulative stats
@@ -84,25 +97,33 @@ def update_standings(new_race_data, new_round):
     prev_round = data_2026['Round'].max()
     prev_standings = data_2026[data_2026['Round'] == prev_round]
 
+    # Collect sprint points per driver
+    sprint_points = {}
+    if sprint_data is not None:
+        for _, row in sprint_data.iterrows():
+            pts = float(row['Points']) if pd.notna(row['Points']) else 0.0
+            sprint_points[row['Abbreviation']] = pts
+
     # Build cumulative stats for the new round
     new_rows = []
     for _, row in new_race_data.iterrows():
         driver = row['Abbreviation']
         team = row['TeamName']
-        points = float(row['Points']) if pd.notna(row['Points']) else 0.0
+        race_points = float(row['Points']) if pd.notna(row['Points']) else 0.0
+        total_points = race_points + sprint_points.get(driver, 0.0)
         position = int(row['Position']) if pd.notna(row['Position']) and row['Position'] > 0 else 99
 
         # Get previous stats for this driver
         prev = prev_standings[prev_standings['Driver'] == driver]
         if not prev.empty:
             prev = prev.iloc[0]
-            cum_points = prev['CumulativePoints'] + points
+            cum_points = prev['CumulativePoints'] + total_points
             wins = int(prev['Wins']) + (1 if position == 1 else 0)
             podiums = int(prev['Podiums']) + (1 if position <= 3 else 0)
             dnfs = int(prev['DNFs']) + (1 if position == 99 else 0)
             races = int(prev['RacesCompleted']) + 1
         else:
-            cum_points = points
+            cum_points = total_points
             wins = 1 if position == 1 else 0
             podiums = 1 if position <= 3 else 0
             dnfs = 1 if position == 99 else 0
@@ -242,14 +263,14 @@ def main():
     print("=" * 60)
 
     # Step 1: Check for new race
-    new_round, race_data = check_for_new_race()
+    new_round, race_data, sprint_data = check_for_new_race()
 
     if new_round is None:
         print("\nNo new race data available. Nothing to update.")
         return
 
-    # Step 2: Update standings
-    standings = update_standings(race_data, new_round)
+    # Step 2: Update standings (race + sprint)
+    standings = update_standings(race_data, new_round, sprint_data)
 
     # Step 3: Run predictions
     print(f"\nRunning model prediction (Round {new_round})...")

@@ -256,6 +256,51 @@ def update_readme(predictions, round_num):
     print(f"Updated README.md with Round {round_num} predictions")
 
 
+def update_prediction_chart(predictions, round_num):
+    """Regenerate the 2026 prediction bar chart."""
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    sns.set_theme(style="whitegrid")
+
+    team_colors = {
+        'Mercedes': '#00D2BE', 'Ferrari': '#DC0000', 'McLaren': '#FF8700',
+        'Red Bull Racing': '#0600EF', 'Haas F1 Team': '#B6BABD',
+        'Alpine': '#0090FF', 'Racing Bulls': '#2B4562', 'Williams': '#005AFF',
+        'Audi': '#006F62', 'Aston Martin': '#006F62', 'Cadillac': '#C0C0C0',
+    }
+
+    total_prob = sum(p['probability'] for p in predictions)
+    drivers = [p['driver'] for p in predictions]
+    norm_probs = [p['probability'] / total_prob * 100 for p in predictions]
+    teams = [p['team'] for p in predictions]
+    points = [p['points'] for p in predictions]
+    colors = [team_colors.get(t, '#888888') for t in teams]
+
+    fig, ax = plt.subplots(figsize=(10, 6), dpi=150)
+    bars = ax.barh(range(len(drivers)), norm_probs, color=colors, edgecolor='black', linewidth=0.5)
+    ax.set_yticks(range(len(drivers)))
+    ax.set_yticklabels([f"{d} ({t})" for d, t in zip(drivers, teams)])
+    ax.set_xlabel('Championship Probability (%)')
+    ax.set_title(f'2026 F1 World Championship Prediction\n(After {round_num} Races - PyTorch LSTM Model)')
+    ax.invert_yaxis()
+
+    for bar, prob, pts in zip(bars, norm_probs, points):
+        ax.text(bar.get_width() + 0.5, bar.get_y() + bar.get_height()/2,
+                f'{prob:.1f}% ({int(pts)} pts)', va='center', fontsize=9)
+
+    ax.set_xlim(0, max(norm_probs) * 1.3)
+    ax.text(0.98, 0.02, f'Model: 2-layer LSTM (64 hidden)\nTrained: 2014-2024\nValidated: 2025 (80% accuracy)',
+            transform=ax.transAxes, ha='right', va='bottom', fontsize=8,
+            bbox=dict(boxstyle='round', facecolor='wheat', alpha=0.5))
+
+    plt.tight_layout()
+    chart_path = os.path.join(RESULTS_DIR, '2026_prediction.png')
+    plt.savefig(chart_path, bbox_inches='tight')
+    plt.close()
+    print(f"Updated 2026_prediction.png")
+
+
 def main():
     print("=" * 60)
     print("F1 CHAMPIONSHIP PREDICTION - AUTOMATED UPDATE")
@@ -287,6 +332,9 @@ def main():
 
     # Step 5: Update README
     update_readme(predictions, new_round)
+
+    # Step 6: Update prediction chart
+    update_prediction_chart(predictions, new_round)
 
     print(f"\n{'='*60}")
     print("UPDATE COMPLETE!")

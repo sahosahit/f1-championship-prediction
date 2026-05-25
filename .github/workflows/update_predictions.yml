@@ -31,12 +31,14 @@ jobs:
 
       - name: Run prediction update
         run: |
-          python src/update_predictions.py
+          python src/update_predictions.py | tee /tmp/update_output.txt
 
       - name: Commit and push changes
         run: |
+          RACE_NAME=$(grep "Found!" /tmp/update_output.txt | head -1 | sed 's/.*(\(.*\)).*/\1/' || echo "latest race")
+          ROUND=$(grep "Checking for Round" /tmp/update_output.txt | grep -o '[0-9]*' || echo "")
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add data/ results/ README.md
-          git diff --staged --quiet || git commit -m "Update predictions after latest race [automated]"
+          git diff --staged --quiet || git commit -m "Update predictions after R${ROUND}: ${RACE_NAME}"
           git push

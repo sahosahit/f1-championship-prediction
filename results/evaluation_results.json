@@ -21,66 +21,66 @@
   },
   "prediction_2026": [
     {
+      "driver": "ANT",
+      "team": "Mercedes",
+      "points": 156.0,
+      "probability": 0.903114914894104
+    },
+    {
       "driver": "RUS",
       "team": "Mercedes",
       "points": 88.0,
-      "probability": 0.8812572956085205
-    },
-    {
-      "driver": "ANT",
-      "team": "Mercedes",
-      "points": 131.0,
-      "probability": 0.8764517307281494
+      "probability": 0.8932474851608276
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
       "points": 75.0,
-      "probability": 0.2613203823566437
+      "probability": 0.1286042183637619
     },
     {
       "driver": "HAM",
       "team": "Ferrari",
-      "points": 72.0,
-      "probability": 0.12714646756649017
+      "points": 90.0,
+      "probability": 0.05820237845182419
     },
     {
       "driver": "NOR",
       "team": "McLaren",
       "points": 58.0,
-      "probability": 0.07141139358282089
-    },
-    {
-      "driver": "BEA",
-      "team": "Haas F1 Team",
-      "points": 18.0,
-      "probability": 0.061716970056295395
+      "probability": 0.035467736423015594
     },
     {
       "driver": "VER",
       "team": "Red Bull",
       "points": 43.0,
-      "probability": 0.060374245047569275
+      "probability": 0.03162490949034691
     },
     {
       "driver": "PIA",
       "team": "McLaren",
-      "points": 48.0,
-      "probability": 0.05932515859603882
+      "points": 60.0,
+      "probability": 0.03148212283849716
     },
     {
       "driver": "GAS",
       "team": "Alpine F1 Team",
-      "points": 20.0,
-      "probability": 0.05651690438389778
+      "points": 26.0,
+      "probability": 0.030359948053956032
     },
     {
       "driver": "LAW",
       "team": "RB F1 Team",
-      "points": 16.0,
-      "probability": 0.05567024275660515
+      "points": 26.0,
+      "probability": 0.030249111354351044
+    },
+    {
+      "driver": "HAD",
+      "team": "Red Bull",
+      "points": 29.0,
+      "probability": 0.029694221913814545
     }
   ],
-  "last_updated": "2026-05-25T11:16:49.980727",
-  "prediction_round": 5
+  "last_updated": "2026-06-08T14:01:54.252455",
+  "prediction_round": 6
 }

@@ -29,9 +29,13 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run prediction update
+      - name: Run driver prediction update
         run: |
           python src/update_predictions.py | tee /tmp/update_output.txt
+
+      - name: Run constructor prediction update
+        run: |
+          python src/update_constructor_predictions.py
 
       - name: Commit and push changes
         run: |
@@ -42,3 +46,4 @@ jobs:
           git add data/ results/ README.md
           git diff --staged --quiet || git commit -m "Update predictions after R${ROUND}: ${RACE_NAME}"
           git push
+

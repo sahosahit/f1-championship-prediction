@@ -1,0 +1,9 @@
+cache/
+.git/
+__pycache__/
+*.pyc
+venv/
+.venv/
+notebooks/
+*.ipynb
+results/*.png

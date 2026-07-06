@@ -23,64 +23,64 @@
     {
       "driver": "ANT",
       "team": "Mercedes",
-      "points": 171.0,
-      "probability": 0.9192888140678406
+      "points": 179.0,
+      "probability": 0.921964168548584
     },
     {
       "driver": "RUS",
       "team": "Mercedes",
-      "points": 131.0,
-      "probability": 0.9061717987060547
+      "points": 154.0,
+      "probability": 0.9103243350982666
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
-      "points": 79.0,
-      "probability": 0.02850320376455784
+      "points": 108.0,
+      "probability": 0.01978926919400692
     },
     {
       "driver": "HAM",
       "team": "Ferrari",
-      "points": 125.0,
-      "probability": 0.021171392872929573
+      "points": 147.0,
+      "probability": 0.017307676374912262
     },
     {
       "driver": "NOR",
       "team": "McLaren",
-      "points": 79.0,
-      "probability": 0.017825990915298462
-    },
-    {
-      "driver": "VER",
-      "team": "Red Bull",
-      "points": 73.0,
-      "probability": 0.017401359975337982
+      "points": 97.0,
+      "probability": 0.015882322564721107
     },
     {
       "driver": "LAW",
       "team": "RB F1 Team",
-      "points": 32.0,
-      "probability": 0.01739615947008133
-    },
-    {
-      "driver": "PIA",
-      "team": "McLaren",
-      "points": 82.0,
-      "probability": 0.017368558794260025
+      "points": 41.0,
+      "probability": 0.015835868194699287
     },
     {
       "driver": "GAS",
       "team": "Alpine F1 Team",
-      "points": 32.0,
-      "probability": 0.017347590997815132
+      "points": 33.0,
+      "probability": 0.015802757814526558
     },
     {
       "driver": "HAD",
       "team": "Red Bull",
-      "points": 45.0,
-      "probability": 0.017290573567152023
+      "points": 55.0,
+      "probability": 0.015764424577355385
+    },
+    {
+      "driver": "VER",
+      "team": "Red Bull",
+      "points": 76.0,
+      "probability": 0.015740951523184776
+    },
+    {
+      "driver": "PIA",
+      "team": "McLaren",
+      "points": 84.0,
+      "probability": 0.015710681676864624
     }
   ],
-  "last_updated": "2026-06-29T13:59:58.191313",
-  "prediction_round": 8
+  "last_updated": "2026-07-06T07:13:58.727029",
+  "prediction_round": 9
 }

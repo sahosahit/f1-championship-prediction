@@ -4,17 +4,17 @@ Predicting the 2026 F1 World Championship winner using a PyTorch LSTM model trai
 
 ## Key Results
 
-**2026 Prediction (After 9 Races):**
+**2026 Prediction (After 10 Races):**
 
 | Driver | Team | Points | Championship Probability |
 |--------|------|--------|--------------------------|
-| ANT | Mercedes | 179 | 46.9% |
-| RUS | Mercedes | 154 | 46.3% |
-| LEC | Ferrari | 108 | 1.0% |
-| HAM | Ferrari | 147 | 0.9% |
-| NOR | McLaren | 97 | 0.8% |
+| ANT | Mercedes | 204 | 47.2% |
+| RUS | Mercedes | 154 | 46.6% |
+| LEC | Ferrari | 126 | 0.8% |
+| HAM | Ferrari | 159 | 0.8% |
+| LAW | RB F1 Team | 41 | 0.8% |
 
-**Model sees a 93% chance a Mercedes driver wins 2026.**
+**Model sees a 94% chance a Mercedes driver wins 2026.**
 
 **Model Performance:**
 - Validated on 2025 season: **80% championship prediction accuracy**

@@ -23,64 +23,64 @@
     {
       "driver": "ANT",
       "team": "Mercedes",
-      "points": 179.0,
-      "probability": 0.921964168548584
+      "points": 204.0,
+      "probability": 0.9238158464431763
     },
     {
       "driver": "RUS",
       "team": "Mercedes",
       "points": 154.0,
-      "probability": 0.9103243350982666
+      "probability": 0.9121946096420288
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
-      "points": 108.0,
-      "probability": 0.01978926919400692
+      "points": 126.0,
+      "probability": 0.01658673584461212
     },
     {
       "driver": "HAM",
       "team": "Ferrari",
-      "points": 147.0,
-      "probability": 0.017307676374912262
-    },
-    {
-      "driver": "NOR",
-      "team": "McLaren",
-      "points": 97.0,
-      "probability": 0.015882322564721107
+      "points": 159.0,
+      "probability": 0.015635911375284195
     },
     {
       "driver": "LAW",
       "team": "RB F1 Team",
       "points": 41.0,
-      "probability": 0.015835868194699287
+      "probability": 0.015068826265633106
     },
     {
       "driver": "GAS",
       "team": "Alpine F1 Team",
       "points": 33.0,
-      "probability": 0.015802757814526558
+      "probability": 0.015056702308356762
     },
     {
       "driver": "HAD",
       "team": "Red Bull",
-      "points": 55.0,
-      "probability": 0.015764424577355385
+      "points": 63.0,
+      "probability": 0.015012731775641441
+    },
+    {
+      "driver": "NOR",
+      "team": "McLaren",
+      "points": 103.0,
+      "probability": 0.014986827038228512
     },
     {
       "driver": "VER",
       "team": "Red Bull",
-      "points": 76.0,
-      "probability": 0.015740951523184776
+      "points": 91.0,
+      "probability": 0.01496028434485197
     },
     {
       "driver": "PIA",
       "team": "McLaren",
-      "points": 84.0,
-      "probability": 0.015710681676864624
+      "points": 94.0,
+      "probability": 0.014928021468222141
     }
   ],
-  "last_updated": "2026-07-06T07:13:58.727029",
-  "prediction_round": 9
+  "last_updated": "2026-07-20T12:11:14.326129",
+  "prediction_round": 10
 }

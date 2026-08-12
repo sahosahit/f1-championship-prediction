@@ -82,5 +82,59 @@
     }
   ],
   "last_updated": "2026-07-27T12:53:24.561818",
-  "prediction_round": 11
+  "prediction_round": 11,
+  "constructor_prediction_2026": [
+    {
+      "team": "Mercedes",
+      "points": 379.0,
+      "probability": 0.9999849796295166
+    },
+    {
+      "team": "Ferrari",
+      "points": 307.0,
+      "probability": 8.398851059610024e-05
+    },
+    {
+      "team": "McLaren",
+      "points": 222.0,
+      "probability": 7.382258627330884e-05
+    },
+    {
+      "team": "RB F1 Team",
+      "points": 70.0,
+      "probability": 2.9629369237227365e-05
+    },
+    {
+      "team": "Red Bull",
+      "points": 180.0,
+      "probability": 2.8689571990980767e-05
+    },
+    {
+      "team": "Alpine F1 Team",
+      "points": 52.0,
+      "probability": 2.764393502729945e-05
+    },
+    {
+      "team": "Haas F1 Team",
+      "points": 21.0,
+      "probability": 1.6985342881525867e-05
+    },
+    {
+      "team": "Williams",
+      "points": 11.0,
+      "probability": 1.663326474954374e-05
+    },
+    {
+      "team": "Audi",
+      "points": 12.0,
+      "probability": 1.6571390005992725e-05
+    },
+    {
+      "team": "Aston Martin",
+      "points": 1.0,
+      "probability": 1.653596518735867e-05
+    }
+  ],
+  "constructor_prediction_round": 11,
+  "constructor_last_updated": "2026-08-12T22:27:35.747738"
 }

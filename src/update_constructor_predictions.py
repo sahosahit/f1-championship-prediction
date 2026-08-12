@@ -121,6 +121,50 @@ def update_constructor_chart(predictions, round_num):
     print(f"Updated 2026_constructor_prediction.png")
 
 
+def update_readme_constructor(predictions, round_num):
+    """Update the constructor prediction table in README.md."""
+    readme_path = os.path.join(BASE_DIR, 'README.md')
+
+    with open(readme_path, 'r') as f:
+        lines = f.readlines()
+
+    start_line = None
+    end_line = None
+    for i, line in enumerate(lines):
+        if '**2026 Constructor Prediction (After' in line:
+            start_line = i
+        if line.startswith('Trained with the same LSTM architecture') and start_line is not None:
+            end_line = i
+            break
+
+    if start_line is None or end_line is None:
+        print(f"WARNING: Could not find README constructor markers (start={start_line}, end={end_line})")
+        return
+
+    total_prob = sum(p['probability'] for p in predictions)
+    new_lines = [
+        f"**2026 Constructor Prediction (After {round_num} Races):**\n",
+        "\n",
+        "| Team | Points | Championship Probability |\n",
+        "|------|--------|--------------------------|" + "\n",
+    ]
+    for p in predictions[:5]:
+        norm = p['probability'] / total_prob * 100
+        new_lines.append(f"| {p['team']} | {p['points']:.0f} | {norm:.1f}% |\n")
+
+    top_team = predictions[0]['team']
+    team_prob = predictions[0]['probability'] / total_prob * 100
+    new_lines.append(f"\n**Model sees a {team_prob:.0f}% chance {top_team} wins the 2026 Constructor Championship.**\n")
+    new_lines.append("\n")
+
+    lines = lines[:start_line] + new_lines + lines[end_line:]
+
+    with open(readme_path, 'w') as f:
+        f.writelines(lines)
+
+    print(f"Updated README.md with Round {round_num} constructor predictions")
+
+
 def main():
     print("=" * 60)
     print("CONSTRUCTOR CHAMPIONSHIP PREDICTION UPDATE")
@@ -148,6 +192,7 @@ def main():
 
     update_constructor_results(predictions, latest_round)
     update_constructor_chart(predictions, latest_round)
+    update_readme_constructor(predictions, latest_round)
 
     print(f"\n{'='*60}")
     print("CONSTRUCTOR UPDATE COMPLETE!")

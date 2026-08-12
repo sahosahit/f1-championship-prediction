@@ -126,7 +126,7 @@ def calculate_championship_accuracy(all_probs, all_targets, data_loader):
             predictions_by_group[key].append({
                 'prob': all_probs[idx],
                 'target': all_targets[idx],
-                'driver': seq['driver']
+                'entity': seq.get('driver', seq.get('team'))
             })
         idx += 1
 

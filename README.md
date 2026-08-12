@@ -23,6 +23,24 @@ Predicting the 2026 F1 World Championship winner using a PyTorch LSTM model trai
 
 ![2026 Prediction](results/2026_prediction.png)
 
+### Constructor Championship (WCC)
+
+**2026 Constructor Prediction (After 11 Races):**
+
+| Team | Points | Championship Probability |
+|------|--------|--------------------------|
+| Mercedes | 379 | 100.0% |
+| Ferrari | 307 | 0.0% |
+| McLaren | 222 | 0.0% |
+| RB F1 Team | 70 | 0.0% |
+| Red Bull | 180 | 0.0% |
+
+**Model sees a 100% chance Mercedes wins the 2026 Constructor Championship.**
+
+Trained with the same LSTM architecture as the Driver Championship model, using team-aggregated standings (combined points, wins, podiums across both drivers per constructor) instead of individual driver data. See [`src/constructor_feature_engineering.py`](src/constructor_feature_engineering.py) and [`src/train_constructor.py`](src/train_constructor.py).
+
+![2026 Constructor Prediction](results/2026_constructor_prediction.png)
+
 ## Problem Statement
 
 After N races in an F1 season, can we predict who wins the World Championship? This is a sequential prediction problem - a driver's championship trajectory (points, wins, momentum) over multiple races forms a time series that an LSTM can learn from.
@@ -95,17 +113,23 @@ f1-championship-prediction/
 ├── notebooks/
 │   └── championship_prediction.ipynb # Full analysis notebook
 ├── src/
-│   ├── data_collection.py           # FastF1 API data collection
-│   ├── feature_engineering.py       # 12 sequential features
-│   ├── dataset.py                   # PyTorch Dataset & DataLoader
-│   ├── model.py                     # LSTM architecture
-│   ├── train.py                     # Training loop
-│   ├── evaluate.py                  # Historical validation
-│   └── visualize.py                 # Generate plots
+│   ├── data_collection.py             # FastF1 API data collection
+│   ├── feature_engineering.py         # 12 sequential features (driver)
+│   ├── constructor_feature_engineering.py  # 12 sequential features (constructor)
+│   ├── dataset.py                     # PyTorch Dataset & DataLoader
+│   ├── model.py                       # LSTM architecture (shared)
+│   ├── train.py                       # Training loop (driver)
+│   ├── train_constructor.py           # Training loop (constructor)
+│   ├── evaluate.py                    # Historical validation
+│   ├── update_predictions.py          # Automated driver prediction update
+│   ├── update_constructor_predictions.py  # Automated constructor prediction update
+│   └── visualize.py                   # Generate plots
 ├── models/
-│   └── best_model.pth               # Trained model checkpoint
+│   ├── best_model.pth                # Trained driver model checkpoint
+│   └── best_constructor_model.pth    # Trained constructor model checkpoint
 ├── results/
 │   ├── 2026_prediction.png
+│   ├── 2026_constructor_prediction.png
 │   ├── accuracy_by_progress.png
 │   ├── season_timelines.png
 │   ├── training_curves.png
@@ -145,10 +169,12 @@ pip install -r requirements.txt
 jupyter notebook notebooks/championship_prediction.ipynb
 
 # Option 2: Run individual scripts
-python src/data_collection.py          # Collect data from FastF1 API
-python src/train.py                    # Train model
-python src/evaluate.py                 # Evaluate + predict 2026
-python src/visualize.py                # Generate plots
+python src/data_collection.py                  # Collect data from FastF1 API
+python src/train.py                            # Train driver championship model
+python src/train_constructor.py                # Train constructor championship model
+python src/evaluate.py                         # Evaluate + predict 2026 (driver)
+python src/update_constructor_predictions.py   # Predict 2026 + update README (constructor)
+python src/visualize.py                        # Generate plots
 ```
 
 **Note:** Data collection requires FastF1 API access (rate limited to 500 calls/hour). The pre-collected CSV files in `data/` are included so you can skip this step.
@@ -178,7 +204,6 @@ Piastri led from Race 12-17, but Norris recovered in the final stretch. The mode
 - Update predictions after each new 2026 race
 - Add inter-driver comparison features
 - Implement attention mechanism for weighting recent form
-- Constructor championship prediction (parallel model)
 - Multi-season trajectory modeling (3-5 year outlook)
 
 ## Tech Stack

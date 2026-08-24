@@ -23,66 +23,66 @@
     {
       "driver": "ANT",
       "team": "Mercedes",
-      "points": 219.0,
-      "probability": 0.9247909784317017
+      "points": 242.0,
+      "probability": 0.9255350232124329
     },
     {
       "driver": "RUS",
       "team": "Mercedes",
-      "points": 160.0,
-      "probability": 0.9133809804916382
+      "points": 183.0,
+      "probability": 0.914975106716156
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
-      "points": 138.0,
-      "probability": 0.015250883996486664
+      "points": 155.0,
+      "probability": 0.014629796147346497
     },
     {
-      "driver": "HAM",
-      "team": "Ferrari",
-      "points": 169.0,
-      "probability": 0.014830066822469234
-    },
-    {
-      "driver": "LAW",
+      "driver": "LIN",
       "team": "RB F1 Team",
-      "points": 45.0,
-      "probability": 0.014656931161880493
+      "points": 25.0,
+      "probability": 0.014482608996331692
     },
     {
       "driver": "GAS",
       "team": "Alpine F1 Team",
-      "points": 33.0,
-      "probability": 0.014654824510216713
+      "points": 35.0,
+      "probability": 0.014411024749279022
     },
     {
-      "driver": "HAD",
+      "driver": "HAM",
+      "team": "Ferrari",
+      "points": 183.0,
+      "probability": 0.014407820999622345
+    },
+    {
+      "driver": "LAW",
       "team": "Red Bull",
-      "points": 71.0,
-      "probability": 0.014600535854697227
-    },
-    {
-      "driver": "NOR",
-      "team": "McLaren",
-      "points": 128.0,
-      "probability": 0.014537000097334385
-    },
-    {
-      "driver": "VER",
-      "team": "Red Bull",
-      "points": 109.0,
-      "probability": 0.014532158151268959
+      "points": 51.0,
+      "probability": 0.014402025379240513
     },
     {
       "driver": "PIA",
       "team": "McLaren",
-      "points": 94.0,
-      "probability": 0.014512197114527225
+      "points": 106.0,
+      "probability": 0.014278531074523926
+    },
+    {
+      "driver": "VER",
+      "team": "Red Bull",
+      "points": 112.0,
+      "probability": 0.014272190630435944
+    },
+    {
+      "driver": "NOR",
+      "team": "McLaren",
+      "points": 159.0,
+      "probability": 0.014270681887865067
     }
   ],
-  "last_updated": "2026-07-27T12:53:24.561818",
-  "prediction_round": 11,
+  "last_updated": "2026-08-24T10:30:29.159264",
+  "prediction_round": 12,
   "constructor_prediction_2026": [
     {
       "team": "Mercedes",

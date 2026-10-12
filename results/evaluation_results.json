@@ -23,66 +23,66 @@
     {
       "driver": "ANT",
       "team": "Mercedes",
-      "points": 320.0,
-      "probability": 0.9266850352287292
+      "points": 340.0,
+      "probability": 0.9268192648887634
     },
     {
       "driver": "RUS",
       "team": "Mercedes",
-      "points": 236.0,
-      "probability": 0.9182668924331665
+      "points": 238.0,
+      "probability": 0.9183485507965088
     },
     {
       "driver": "LIN",
       "team": "RB F1 Team",
       "points": 38.0,
-      "probability": 0.01405537873506546
+      "probability": 0.014010922983288765
     },
     {
       "driver": "GAS",
       "team": "Alpine F1 Team",
       "points": 41.0,
-      "probability": 0.01401661615818739
+      "probability": 0.01397663727402687
     },
     {
       "driver": "LAW",
       "team": "RB F1 Team",
-      "points": 65.0,
-      "probability": 0.013992608524858952
+      "points": 75.0,
+      "probability": 0.013949621468782425
     },
     {
       "driver": "PIA",
       "team": "McLaren",
-      "points": 128.0,
-      "probability": 0.013901502825319767
+      "points": 138.0,
+      "probability": 0.013863857835531235
     },
     {
       "driver": "LEC",
       "team": "Ferrari",
-      "points": 191.0,
-      "probability": 0.013898313045501709
+      "points": 215.0,
+      "probability": 0.013848238624632359
     },
     {
       "driver": "VER",
       "team": "Red Bull",
-      "points": 188.0,
-      "probability": 0.013869953341782093
+      "points": 221.0,
+      "probability": 0.013818023726344109
     },
     {
       "driver": "NOR",
       "team": "McLaren",
-      "points": 188.0,
-      "probability": 0.013839737512171268
+      "points": 201.0,
+      "probability": 0.01380905881524086
     },
     {
       "driver": "HAM",
       "team": "Ferrari",
-      "points": 214.0,
-      "probability": 0.01383891049772501
+      "points": 229.0,
+      "probability": 0.013788152486085892
     }
   ],
-  "last_updated": "2026-10-05T18:59:35.241395",
-  "prediction_round": 16,
+  "last_updated": "2026-10-12T19:32:32.261862",
+  "prediction_round": 17,
   "constructor_prediction_2026": [
     {
       "team": "Mercedes",

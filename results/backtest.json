@@ -1,0 +1,374 @@
+{
+  "years": [
+    2014,
+    2015,
+    2016,
+    2017,
+    2018,
+    2019,
+    2020,
+    2021,
+    2022,
+    2023,
+    2024,
+    2025
+  ],
+  "first_round": 4,
+  "lstm_trained_through": 2024,
+  "overall": {
+    "simulation": {
+      "n": 204,
+      "accuracy": 0.7549019607843137,
+      "p_champion": 0.7491254901960783,
+      "brier": 0.3497273545098039
+    },
+    "leader": {
+      "n": 204,
+      "accuracy": 0.7696078431372549,
+      "p_champion": 0.7696078431372549,
+      "brier": 0.46078431372549017
+    },
+    "lstm": {
+      "n": 204,
+      "accuracy": 0.5931372549019608,
+      "p_champion": 0.4946308498926091,
+      "brier": 0.4693836192202415
+    }
+  },
+  "lstm_validation_season": {
+    "simulation": {
+      "n": 20,
+      "accuracy": 0.2,
+      "p_champion": 0.26984,
+      "brier": 1.2172882880000002
+    },
+    "leader": {
+      "n": 20,
+      "accuracy": 0.25,
+      "p_champion": 0.25,
+      "brier": 1.5
+    },
+    "lstm": {
+      "n": 20,
+      "accuracy": 0.65,
+      "p_champion": 0.40010373713360564,
+      "brier": 0.5536516740300177
+    }
+  },
+  "by_stage": {
+    "First third": {
+      "simulation": {
+        "n": 45,
+        "accuracy": 0.6888888888888889,
+        "p_champion": 0.669008888888889,
+        "brier": 0.45722699555555557
+      },
+      "leader": {
+        "n": 45,
+        "accuracy": 0.6888888888888889,
+        "p_champion": 0.6888888888888889,
+        "brier": 0.6222222222222222
+      },
+      "lstm": {
+        "n": 45,
+        "accuracy": 0.4666666666666667,
+        "p_champion": 0.3481710784459374,
+        "brier": 0.5976141238537139
+      }
+    },
+    "Middle third": {
+      "simulation": {
+        "n": 83,
+        "accuracy": 0.6385542168674698,
+        "p_champion": 0.67655421686747,
+        "brier": 0.48286674409638564
+      },
+      "leader": {
+        "n": 83,
+        "accuracy": 0.6626506024096386,
+        "p_champion": 0.6626506024096386,
+        "brier": 0.6746987951807228
+      },
+      "lstm": {
+        "n": 83,
+        "accuracy": 0.5421686746987951,
+        "p_champion": 0.4987937498678186,
+        "brier": 0.4921880776606957
+      }
+    },
+    "Final third": {
+      "simulation": {
+        "n": 76,
+        "accuracy": 0.9210526315789473,
+        "p_champion": 0.8758184210526316,
+        "brier": 0.14067402315789473
+      },
+      "leader": {
+        "n": 76,
+        "accuracy": 0.9342105263157895,
+        "p_champion": 0.9342105263157895,
+        "brier": 0.13157894736842105
+      },
+      "lstm": {
+        "n": 76,
+        "accuracy": 0.7236842105263158,
+        "p_champion": 0.5768041264341595,
+        "brier": 0.36855279344308434
+      }
+    }
+  },
+  "by_season": {
+    "2014": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 15,
+        "accuracy": 0.4,
+        "p_champion": 0.4402666666666667,
+        "brier": 0.7795199680000002
+      },
+      "leader": {
+        "n": 15,
+        "accuracy": 0.4,
+        "p_champion": 0.4,
+        "brier": 1.2
+      },
+      "lstm": {
+        "n": 15,
+        "accuracy": 0.0,
+        "p_champion": 0.42180070460898356,
+        "brier": 0.5585351631077706
+      }
+    },
+    "2015": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 15,
+        "accuracy": 1.0,
+        "p_champion": 0.9678933333333333,
+        "brier": 0.00720704
+      },
+      "leader": {
+        "n": 15,
+        "accuracy": 1.0,
+        "p_champion": 1.0,
+        "brier": 0.0
+      },
+      "lstm": {
+        "n": 15,
+        "accuracy": 1.0,
+        "p_champion": 0.4711662591617026,
+        "brier": 0.4296902465050832
+      }
+    },
+    "2016": {
+      "champion": "ROS",
+      "simulation": {
+        "n": 17,
+        "accuracy": 0.7647058823529411,
+        "p_champion": 0.7211882352941176,
+        "brier": 0.2737494494117647
+      },
+      "leader": {
+        "n": 17,
+        "accuracy": 0.7647058823529411,
+        "p_champion": 0.7647058823529411,
+        "brier": 0.47058823529411764
+      },
+      "lstm": {
+        "n": 17,
+        "accuracy": 1.0,
+        "p_champion": 0.8011841805256329,
+        "brier": 0.07150401095935555
+      }
+    },
+    "2017": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 16,
+        "accuracy": 0.4375,
+        "p_champion": 0.504775,
+        "brier": 0.79558642
+      },
+      "leader": {
+        "n": 16,
+        "accuracy": 0.4375,
+        "p_champion": 0.4375,
+        "brier": 1.125
+      },
+      "lstm": {
+        "n": 16,
+        "accuracy": 0.125,
+        "p_champion": 0.4413513147469721,
+        "brier": 0.5235767097025981
+      }
+    },
+    "2018": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 17,
+        "accuracy": 0.8235294117647058,
+        "p_champion": 0.8214117647058823,
+        "brier": 0.1477620705882353
+      },
+      "leader": {
+        "n": 17,
+        "accuracy": 0.8235294117647058,
+        "p_champion": 0.8235294117647058,
+        "brier": 0.35294117647058826
+      },
+      "lstm": {
+        "n": 17,
+        "accuracy": 0.29411764705882354,
+        "p_champion": 0.43312883748408804,
+        "brier": 0.5398923629082918
+      }
+    },
+    "2019": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 17,
+        "accuracy": 0.9411764705882353,
+        "p_champion": 0.958235294117647,
+        "brier": 0.03464109176470589
+      },
+      "leader": {
+        "n": 17,
+        "accuracy": 0.9411764705882353,
+        "p_champion": 0.9411764705882353,
+        "brier": 0.11764705882352941
+      },
+      "lstm": {
+        "n": 17,
+        "accuracy": 0.7058823529411765,
+        "p_champion": 0.4473151525636349,
+        "brier": 0.5153663528547652
+      }
+    },
+    "2020": {
+      "champion": "HAM",
+      "simulation": {
+        "n": 13,
+        "accuracy": 1.0,
+        "p_champion": 0.9989692307692307,
+        "brier": 8.818461538461523e-06
+      },
+      "leader": {
+        "n": 13,
+        "accuracy": 1.0,
+        "p_champion": 1.0,
+        "brier": 0.0
+      },
+      "lstm": {
+        "n": 13,
+        "accuracy": 0.7692307692307693,
+        "p_champion": 0.4357533028214352,
+        "brier": 0.5238381291479174
+      }
+    },
+    "2021": {
+      "champion": "VER",
+      "simulation": {
+        "n": 18,
+        "accuracy": 0.6666666666666666,
+        "p_champion": 0.5707666666666666,
+        "brier": 0.5531390266666666
+      },
+      "leader": {
+        "n": 18,
+        "accuracy": 0.7777777777777778,
+        "p_champion": 0.7777777777777778,
+        "brier": 0.4444444444444444
+      },
+      "lstm": {
+        "n": 18,
+        "accuracy": 0.2777777777777778,
+        "p_champion": 0.44651441267187497,
+        "brier": 0.5200152442393804
+      }
+    },
+    "2022": {
+      "champion": "VER",
+      "simulation": {
+        "n": 18,
+        "accuracy": 0.8888888888888888,
+        "p_champion": 0.8233888888888887,
+        "brier": 0.25972089333333337
+      },
+      "leader": {
+        "n": 18,
+        "accuracy": 0.8888888888888888,
+        "p_champion": 0.8888888888888888,
+        "brier": 0.2222222222222222
+      },
+      "lstm": {
+        "n": 18,
+        "accuracy": 0.2222222222222222,
+        "p_champion": 0.25743625136840226,
+        "brier": 0.9792505610710257
+      }
+    },
+    "2023": {
+      "champion": "VER",
+      "simulation": {
+        "n": 18,
+        "accuracy": 1.0,
+        "p_champion": 0.9862444444444445,
+        "brier": 0.00393576
+      },
+      "leader": {
+        "n": 18,
+        "accuracy": 1.0,
+        "p_champion": 1.0,
+        "brier": 0.0
+      },
+      "lstm": {
+        "n": 18,
+        "accuracy": 1.0,
+        "p_champion": 0.5585075099381243,
+        "brier": 0.35927806224389036
+      }
+    },
+    "2024": {
+      "champion": "VER",
+      "simulation": {
+        "n": 20,
+        "accuracy": 1.0,
+        "p_champion": 0.9939,
+        "brier": 0.0005647719999999996
+      },
+      "leader": {
+        "n": 20,
+        "accuracy": 1.0,
+        "p_champion": 1.0,
+        "brier": 0.0
+      },
+      "lstm": {
+        "n": 20,
+        "accuracy": 1.0,
+        "p_champion": 0.7734887087435675,
+        "brier": 0.103098234585664
+      }
+    },
+    "2025": {
+      "champion": "NOR",
+      "simulation": {
+        "n": 20,
+        "accuracy": 0.2,
+        "p_champion": 0.26984,
+        "brier": 1.2172882880000002
+      },
+      "leader": {
+        "n": 20,
+        "accuracy": 0.25,
+        "p_champion": 0.25,
+        "brier": 1.5
+      },
+      "lstm": {
+        "n": 20,
+        "accuracy": 0.65,
+        "p_champion": 0.40010373713360564,
+        "brier": 0.5536516740300177
+      }
+    }
+  }
+}

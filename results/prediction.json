@@ -1,0 +1,220 @@
+{
+  "season": 2026,
+  "round": 21,
+  "event": "Las Vegas Grand Prix",
+  "rounds_total": 23,
+  "rounds_remaining": 2,
+  "sprints_remaining": 0,
+  "points_still_available": 50,
+  "drivers_title_clinched": true,
+  "n_sims": 20000,
+  "drivers": [
+    {
+      "driver": "ANT",
+      "team": "Mercedes",
+      "points": 402.0,
+      "probability": 1.0
+    },
+    {
+      "driver": "VER",
+      "team": "Red Bull",
+      "points": 304.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "HAM",
+      "team": "Ferrari",
+      "points": 267.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "NOR",
+      "team": "McLaren",
+      "points": 264.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "RUS",
+      "team": "Mercedes",
+      "points": 264.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "LEC",
+      "team": "Ferrari",
+      "points": 250.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "PIA",
+      "team": "McLaren",
+      "points": 167.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "HAD",
+      "team": "Red Bull",
+      "points": 122.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "LAW",
+      "team": "RB F1 Team",
+      "points": 89.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "GAS",
+      "team": "Alpine F1 Team",
+      "points": 52.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "LIN",
+      "team": "RB F1 Team",
+      "points": 38.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "COL",
+      "team": "Alpine F1 Team",
+      "points": 35.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "BEA",
+      "team": "Haas F1 Team",
+      "points": 23.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "BOR",
+      "team": "Audi",
+      "points": 14.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "HUL",
+      "team": "Audi",
+      "points": 14.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "SAI",
+      "team": "Williams",
+      "points": 11.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "ALO",
+      "team": "Aston Martin",
+      "points": 7.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "OCO",
+      "team": "Haas F1 Team",
+      "points": 7.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "ALB",
+      "team": "Williams",
+      "points": 5.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "HIR",
+      "team": "Haas F1 Team",
+      "points": 1.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "TSU",
+      "team": "RB F1 Team",
+      "points": 1.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "BOT",
+      "team": "Cadillac F1 Team",
+      "points": 0.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "CAM",
+      "team": "Haas F1 Team",
+      "points": 0.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "PER",
+      "team": "Cadillac F1 Team",
+      "points": 0.0,
+      "probability": 0.0
+    },
+    {
+      "driver": "STR",
+      "team": "Aston Martin",
+      "points": 0.0,
+      "probability": 0.0
+    }
+  ],
+  "teams": [
+    {
+      "team": "Mercedes",
+      "points": 666.0,
+      "probability": 1.0
+    },
+    {
+      "team": "Ferrari",
+      "points": 517.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Red Bull",
+      "points": 440.0,
+      "probability": 0.0
+    },
+    {
+      "team": "McLaren",
+      "points": 431.0,
+      "probability": 0.0
+    },
+    {
+      "team": "RB F1 Team",
+      "points": 114.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Alpine F1 Team",
+      "points": 87.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Haas F1 Team",
+      "points": 31.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Audi",
+      "points": 28.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Williams",
+      "points": 16.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Aston Martin",
+      "points": 7.0,
+      "probability": 0.0
+    },
+    {
+      "team": "Cadillac F1 Team",
+      "points": 0.0,
+      "probability": 0.0
+    }
+  ]
+}

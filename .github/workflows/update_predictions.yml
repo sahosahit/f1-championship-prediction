@@ -29,13 +29,9 @@ jobs:
         run: |
           pip install -r requirements.txt
 
-      - name: Run driver prediction update
+      - name: Refresh results and re-run the season simulation
         run: |
           python src/update_predictions.py | tee /tmp/update_output.txt
-
-      - name: Run constructor prediction update
-        run: |
-          python src/update_constructor_predictions.py
 
       - name: Commit and push changes
         run: |

@@ -1,215 +1,169 @@
-# F1 Championship Prediction with PyTorch LSTM
+# F1 Championship Prediction
 
-Predicting the 2026 F1 World Championship winner using a PyTorch LSTM model trained on 12 seasons of historical data (2014-2025).
+Who will win the Formula 1 world championship, and how sure can we be after each race?
 
-## Key Results
+This project answers that in two ways and checks both against twelve past seasons:
 
-**2026 Prediction (After 21 Races):**
+- **A season simulation** (the headline model): play out the remaining races thousands of times and count how often each driver and team finishes on top.
+- **An LSTM classifier** (PyTorch), kept as a comparison: a neural network that reads each driver's season so far and outputs a title probability.
 
-| Driver | Team | Points | Championship Probability |
-|--------|------|--------|--------------------------|
-| ANT | Mercedes | 402 | 47.4% |
-| RUS | Mercedes | 264 | 47.0% |
-| GAS | Alpine F1 Team | 53 | 0.7% |
-| HAD | Red Bull | 49 | 0.7% |
-| LAW | RB F1 Team | 85 | 0.7% |
+The standings are rebuilt every Monday from the official results by a GitHub Action, and the sections marked as generated below are rendered from results files. A test fails if the README and those files disagree.
 
-**Model sees a 94% chance a Mercedes driver wins 2026.**
+## Current prediction
 
-**Model Performance:**
-- Validated on 2025 season: **80% championship prediction accuracy**
-- Late-season accuracy (R19+): **83.8%**
-- Correctly predicts dominant champions (2015, 2016, 2023, 2024): **100%**
+<!-- prediction:start -->
+**2026 season after round 21 of 23 (Las Vegas Grand Prix).** 2 rounds left, of which 0 are sprint weekends; a driver can still score at most 50 points.
 
-![2026 Prediction](results/2026_prediction.png)
+**ANT has won the 2026 drivers' championship**: the lead is larger than the points still available.
 
-### Constructor Championship (WCC)
+| Driver | Team | Points | Title probability |
+|---|---|---|---|
+| ANT | Mercedes | 402 | 100.0% |
+| VER | Red Bull | 304 | 0.0% |
+| HAM | Ferrari | 267 | 0.0% |
+| NOR | McLaren | 264 | 0.0% |
+| RUS | Mercedes | 264 | 0.0% |
+| LEC | Ferrari | 250 | 0.0% |
 
-**2026 Constructor Prediction (After 11 Races):**
+| Team | Points | Constructors' title probability |
+|---|---|---|
+| Mercedes | 666 | 100.0% |
+| Ferrari | 517 | 0.0% |
+| Red Bull | 440 | 0.0% |
+| McLaren | 431 | 0.0% |
 
-| Team | Points | Championship Probability |
-|------|--------|--------------------------|
-| Mercedes | 379 | 100.0% |
-| Ferrari | 307 | 0.0% |
-| McLaren | 222 | 0.0% |
-| RB F1 Team | 70 | 0.0% |
-| Red Bull | 180 | 0.0% |
+From 20,000 simulated seasons. Drivers not shown are at or near 0%.
+<!-- prediction:end -->
 
-**Model sees a 100% chance Mercedes wins the 2026 Constructor Championship.**
+![Current prediction](results/2026_prediction.png)
 
-Trained with the same LSTM architecture as the Driver Championship model, using team-aggregated standings (combined points, wins, podiums across both drivers per constructor) instead of individual driver data. See [`src/constructor_feature_engineering.py`](src/constructor_feature_engineering.py) and [`src/train_constructor.py`](src/train_constructor.py).
+## How good are the predictions?
 
-![2026 Constructor Prediction](results/2026_constructor_prediction.png)
+Each method was replayed through past seasons, using only what was known after each round.
 
-## Problem Statement
+<!-- backtest:start -->
+Seasons 2014–2025, one prediction after every round from round 4 to the second-last: 204 predictions per method.
 
-After N races in an F1 season, can we predict who wins the World Championship? This is a sequential prediction problem - a driver's championship trajectory (points, wins, momentum) over multiple races forms a time series that an LSTM can learn from.
+| All seasons | Top pick was the champion | Probability given to the champion | Brier score (lower is better) |
+|---|---|---|---|
+| Season simulation | 75.5% | 74.9% | 0.350 |
+| Points leader wins | 77.0% | 77.0% | 0.461 |
+| LSTM classifier | 59.3% | 49.5% | 0.469 |
 
-**Training Data:** 2014-2024 (11 complete seasons, ~240 races)  
-**Validation:** 2025 season (tight 3-way fight: Norris 394 vs Verstappen 389 vs Piastri 381)  
-**Prediction:** 2026 season (6 races completed, Antonelli leads with 100 pts)
+By stage of the season (Brier score, lower is better):
 
-## Model Architecture
+| Stage | Predictions | Season simulation | Points leader wins | LSTM classifier |
+|---|---|---|---|---|
+| First third | 45 | 0.457 | 0.622 | 0.598 |
+| Middle third | 83 | 0.483 | 0.675 | 0.492 |
+| Final third | 76 | 0.141 | 0.132 | 0.369 |
+
+By season (how often the top pick was the eventual champion):
+
+| Season | Champion | Season simulation | Points leader wins | LSTM classifier |
+|---|---|---|---|---|
+| 2014 | HAM | 40% | 40% | 0% |
+| 2015 | HAM | 100% | 100% | 100% |
+| 2016 | ROS | 76% | 76% | 100% |
+| 2017 | HAM | 44% | 44% | 12% |
+| 2018 | HAM | 82% | 82% | 29% |
+| 2019 | HAM | 94% | 94% | 71% |
+| 2020 | HAM | 100% | 100% | 77% |
+| 2021 | VER | 67% | 78% | 28% |
+| 2022 | VER | 89% | 89% | 22% |
+| 2023 | VER | 100% | 100% | 100% |
+| 2024 | VER | 100% | 100% | 100% |
+| 2025 | NOR | 20% | 25% | 65% |
+<!-- backtest:end -->
+
+**What this shows.**
+
+- The simulation picks the eventual champion about as often as the simplest possible rule, "whoever leads the standings wins". Picking the leader is hard to beat.
+- Where the simulation helps is in how sure it is. The Brier score punishes confident wrong calls, and the simulation scores better than the leader rule because it hedges when the fight is close.
+- The LSTM does worse than both across the full set, even though it was trained on 2014–2024, so those seasons are not new to it. 2025 was used to choose which training run to keep, so it has no season that is completely new to it. Its better showing in 2025 is one season and should not be read as more than that.
+- All three struggle with seasons where the lead changed hands late (2014, 2017, 2021, 2025). Nothing here models car development or form swings.
+
+**The scores.** "Top pick was the champion" is plain accuracy. "Probability given to the champion" is how much weight the method put on the driver who went on to win. The Brier score is the squared error of the whole probability table: 0 is a perfect call and 2 is a certain wrong one.
+
+## How the simulation works
+
+Each remaining round is filled in with a round already run this season, drawn at random. Every driver and team gets the points they really scored in the drawn round. Do this for every remaining round, add the points to the current standings, and note who finishes on top. Repeat 20,000 times.
+
+This keeps the result honest in ways a per-driver classifier cannot:
+
+- **Probabilities add up to 100%**, because each simulated season has exactly one champion.
+- **A driver who cannot catch up gets 0%**, because nobody can score more in a simulated round than someone really scored in a round. The README also states the plain arithmetic: once the lead is larger than the points still available, the title is decided.
+- **Points within a round stay consistent.** Whole rounds are drawn, so two drivers cannot both win the same race.
+- **Sprint weekends are drawn from past sprint weekends** when there are any, because more points are on offer.
+- **Team points follow the team a driver was with at the time**, so mid-season driver changes do not move points between teams.
+
+### Limitations
+
+- It assumes the rest of the season looks like the season so far. It knows nothing about upgrades, driver changes or which circuits remain.
+- Early in a season there are few rounds to draw from, so it can be overconfident after one team's strong start.
+- Drivers level on points are split at random; the real tie-break is countback on wins.
+- A driver's results are not separated from their car's. A parametric model of driver and car strength would be the next step.
+
+## The LSTM classifier
 
 ```
-Input: (batch, seq_len, 12 features)
-  ├─ Points normalized, Position, Gap to leader
-  ├─ Win rate, Podium rate, Points per race
-  ├─ Season progress, Consistency
-  └─ Momentum, Is leader, Points share, Recent form
-            ↓
-LSTM Layer 1: (input=12, hidden=64)
-            ↓
-LSTM Layer 2: (input=64, hidden=64) + Dropout(0.3)
-            ↓
-Linear: (64 → 1)
-            ↓
-Sigmoid → Championship Probability (0-1)
-
-Parameters: 53,313
-Loss: BCEWithLogitsLoss (pos_weight=9 for class imbalance)
+Input per round (12 features): points and position (normalised), gap to leader,
+win rate, podium rate, points per race, season progress, consistency,
+momentum, is-leader flag, points share, recent form
+        ↓
+2-layer LSTM (hidden size 64, dropout 0.3)
+        ↓
+Linear → sigmoid: "does this driver win the title?"
 ```
 
-## Accuracy by Season Progress
+53,313 parameters, trained with a class-weighted binary loss on 2014–2024, with 2025 used for early stopping.
 
-The model improves as more races are completed:
+Its design has a built-in weakness for this problem: each driver is scored on their own, so the outputs do not add up to one and the model cannot see that a rival is out of reach. The numbers in the backtest table are its outputs rescaled to sum to one.
 
-![Accuracy by Progress](results/accuracy_by_progress.png)
+The checkpoint in `models/` was trained on an earlier version of the dataset that left out sprint points. It has not been retrained on the corrected data, which is one more reason to treat it as a comparison and not as the model of record. `results/training_curves.png` and `results/model_architecture.png` are from that training run.
 
-| Season Stage | Accuracy |
-|-------------|----------|
-| Early (R4-R6) | 41.7% |
-| Mid-Early (R7-R10) | 54.2% |
-| Mid (R11-R14) | 58.3% |
-| Mid-Late (R15-R18) | 63.8% |
-| Late (R19+) | 83.8% |
+## Data
 
-## Historical Validation (2014-2025)
+Race results, sprint results and calendars for 2014–2026 come from the [Jolpica API](https://api.jolpi.ca) (the successor to Ergast) and are stored in `data/season_results.csv` and `data/calendar.csv`.
 
-| Season | Champion | Accuracy | Notes |
-|--------|----------|----------|-------|
-| 2014 | HAM | 0% | ROS led early, HAM won late |
-| 2015 | HAM | 100% | Dominant from start |
-| 2016 | ROS | 100% | Led from start |
-| 2017 | HAM | 6% | VET led early, HAM comeback |
-| 2018 | HAM | 33% | VET led first half |
-| 2019 | HAM | 72% | Came from behind after R8 |
-| 2020 | HAM | 79% | Came from behind after R4 |
-| 2021 | VER | 32% | HAM led most, VER won Abu Dhabi |
-| 2022 | VER | 11% | LEC led early, VER dominant later |
-| 2023 | VER | 100% | Dominant from start |
-| 2024 | VER | 100% | Dominant from start |
-| 2025 | NOR | 81% | Led most, PIA took lead mid-season, NOR recovered |
+`data/championship_standings.csv` is always rebuilt from the full list of results. It is never updated one round at a time, so a driver who misses a round keeps their points and a corrected result upstream corrects everything downstream.
 
-**Pattern:** Model excels at predicting dominant champions but struggles with comeback seasons.
+## Running it
 
-## Project Structure
+```bash
+pip install -r requirements.txt
+
+pytest                              # run the tests
+python src/update_predictions.py    # refresh this season, re-simulate, update README and chart
+python -m src.backtest              # replay 2014–2025 and write results/backtest.json
+python src/train.py                 # retrain the LSTM (optional)
+```
+
+The prediction service in `api/` (FastAPI, with a Dockerfile) serves the LSTM classifier.
+
+## Project structure
 
 ```
 f1-championship-prediction/
-├── data/
-│   ├── championship_standings.csv    # Race-by-race standings (2014-2026)
-│   └── race_results.csv             # Raw race results
-├── notebooks/
-│   └── championship_prediction.ipynb # Full analysis notebook
 ├── src/
-│   ├── data_collection.py             # FastF1 API data collection
-│   ├── feature_engineering.py         # 12 sequential features (driver)
-│   ├── constructor_feature_engineering.py  # 12 sequential features (constructor)
-│   ├── dataset.py                     # PyTorch Dataset & DataLoader
-│   ├── model.py                       # LSTM architecture (shared)
-│   ├── train.py                       # Training loop (driver)
-│   ├── train_constructor.py           # Training loop (constructor)
-│   ├── evaluate.py                    # Historical validation
-│   ├── update_predictions.py          # Automated driver prediction update
-│   ├── update_constructor_predictions.py  # Automated constructor prediction update
-│   └── visualize.py                   # Generate plots
-├── models/
-│   ├── best_model.pth                # Trained driver model checkpoint
-│   └── best_constructor_model.pth    # Trained constructor model checkpoint
-├── results/
-│   ├── 2026_prediction.png
-│   ├── 2026_constructor_prediction.png
-│   ├── accuracy_by_progress.png
-│   ├── season_timelines.png
-│   ├── training_curves.png
-│   ├── model_architecture.png
-│   ├── training_history.json
-│   ├── evaluation_results.json
-│   └── config.json
-├── requirements.txt
-├── .gitignore
-└── README.md
+│   ├── results_data.py        # official results and calendar
+│   ├── standings.py           # standings rebuilt from results
+│   ├── season_simulation.py   # rest-of-season simulation
+│   ├── backtest.py            # replay past seasons, score each method
+│   ├── report.py              # prediction file and generated README blocks
+│   ├── update_predictions.py  # weekly update entry point
+│   └── model.py, dataset.py, feature_engineering.py, train.py, evaluate.py   # LSTM
+├── data/                      # results, calendar, standings
+├── results/                   # prediction.json, backtest.json, charts
+├── api/                       # FastAPI service for the LSTM
+├── notebooks/                 # original LSTM analysis notebook
+└── tests/
 ```
 
-## Features (12 per time step)
+The notebook and the constructor LSTM scripts (`train_constructor.py`, `update_constructor_predictions.py`) are from the original LSTM-only version of the project. The constructors' prediction now comes from the same simulation as the drivers'.
 
-| # | Feature | Description |
-|---|---------|-------------|
-| 1 | Points normalized | Cumulative points / max possible at this stage |
-| 2 | Position normalized | Championship standing (1 = best → 1.0) |
-| 3 | Gap to leader | Distance to P1 (0 = is leader) |
-| 4 | Win rate | Wins / races completed |
-| 5 | Podium rate | Podiums / races completed |
-| 6 | Points per race | Consistency metric normalized |
-| 7 | Season progress | Current round / total rounds |
-| 8 | Consistency | 1 - DNF rate |
-| 9 | Momentum | Change in PPR vs previous race |
-| 10 | Is leader | Binary: currently P1 in championship |
-| 11 | Points share | Fraction of total possible points |
-| 12 | Recent form | Points scored this race / max per race |
+## Future work
 
-## How to Run
-
-```bash
-# Install dependencies
-pip install -r requirements.txt
-
-# Option 1: Run the notebook (recommended)
-jupyter notebook notebooks/championship_prediction.ipynb
-
-# Option 2: Run individual scripts
-python src/data_collection.py                  # Collect data from FastF1 API
-python src/train.py                            # Train driver championship model
-python src/train_constructor.py                # Train constructor championship model
-python src/evaluate.py                         # Evaluate + predict 2026 (driver)
-python src/update_constructor_predictions.py   # Predict 2026 + update README (constructor)
-python src/visualize.py                        # Generate plots
-```
-
-**Note:** Data collection requires FastF1 API access (rate limited to 500 calls/hour). The pre-collected CSV files in `data/` are included so you can skip this step.
-
-## Insights
-
-### Why 2025 Was Special
-The 2025 championship was decided by just 13 points between three drivers:
-- Norris (394 pts, 7 wins) - Champion
-- Verstappen (389 pts, 8 wins)
-- Piastri (381 pts, 7 wins)
-
-Piastri led from Race 12-17, but Norris recovered in the final stretch. The model correctly predicted Norris for 81% of the season despite this mid-season lead change.
-
-### What the Model Learned
-- **Consistency matters more than raw wins** (Norris won with fewer wins than Verstappen)
-- **Early dominance usually holds** (leader after R6 won 67% of championships historically)
-- **Mercedes dominance pattern** (2026 looks similar to Mercedes 2014-2016 era)
-
-### Limitations
-- Struggles with comeback seasons (2014, 2017, 2022)
-- Trained on era of dominant champions (Hamilton/Verstappen monopoly)
-- Individual driver features only (no team dynamics or car development modeling)
-
-## Future Work
-
-- Update predictions after each new 2026 race
-- Add inter-driver comparison features
-- Implement attention mechanism for weighting recent form
-- Multi-season trajectory modeling (3-5 year outlook)
-
-## Tech Stack
-
-- **PyTorch** - LSTM model, custom Dataset, packed sequences for variable-length input
-- **FastF1** - Official F1 timing data API
-- **pandas / numpy** - Data processing and feature engineering
-- **matplotlib / seaborn** - Visualization
-- **scikit-learn** - Preprocessing utilities
+- A driver-and-car strength model with uncertainty, in place of redrawing past rounds.
+- Retrain the LSTM on the corrected data with each season held out in turn, so its backtest is a fair one.
+- Countback on wins for ties.

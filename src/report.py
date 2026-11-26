@@ -10,6 +10,7 @@ disagree with the numbers of record.
 import json
 import os
 
+from .points import max_points_remaining
 from .season_simulation import DEFAULT_SIMS, simulate_title
 from .standings import build_standings, round_points, team_round_points
 
@@ -19,10 +20,10 @@ PREDICTION_PATH = os.path.join(RESULTS_DIR, "prediction.json")
 BACKTEST_PATH = os.path.join(RESULTS_DIR, "backtest.json")
 README_PATH = os.path.join(BASE_DIR, "README.md")
 
-RACE_WIN_POINTS = 25
-SPRINT_WIN_POINTS = 8
-METHOD_NAMES = {"simulation": "Season simulation", "leader": "Points leader wins",
-                "lstm": "LSTM classifier"}
+MIN_ROUND_TO_PUBLISH = 6
+METHOD_NAMES = {"simulation": "Season simulation", "leader_hedged": "Points leader, hedged",
+                "leader": "Points leader, certain", "lstm": "LSTM classifier"}
+METHOD_ORDER = ("simulation", "leader_hedged", "leader", "lstm")
 
 
 def build_prediction(results, calendar, year, n_sims=DEFAULT_SIMS):
@@ -30,7 +31,8 @@ def build_prediction(results, calendar, year, n_sims=DEFAULT_SIMS):
     season = results[results["Year"] == year]
     rnd = int(season["Round"].max())
     sprint = calendar[calendar["Year"] == year].set_index("Round")["IsSprint"]
-    remaining = [bool(sprint[r]) for r in sprint.index if r > rnd]
+    rounds_left = [r for r in sprint.index if r > rnd]
+    remaining = [bool(sprint[r]) for r in rounds_left]
     simulated = simulate_title(
         round_points(results, year), team_round_points(results, year),
         {r: bool(sprint[r]) for r in sprint.index if r <= rnd}, remaining, n_sims=n_sims,
@@ -53,7 +55,7 @@ def build_prediction(results, calendar, year, n_sims=DEFAULT_SIMS):
     )
 
     # Arithmetic check that does not depend on the simulation.
-    per_driver = RACE_WIN_POINTS * len(remaining) + SPRINT_WIN_POINTS * sum(remaining)
+    per_driver = max_points_remaining(year, rounds_left, remaining, int(sprint.index.max()))
     by_points = sorted((d["points"] for d in drivers), reverse=True)
     lead = by_points[0] - by_points[1] if len(by_points) > 1 else float("inf")
     return {
@@ -65,22 +67,40 @@ def build_prediction(results, calendar, year, n_sims=DEFAULT_SIMS):
         "sprints_remaining": int(sum(remaining)),
         "points_still_available": int(per_driver),
         "drivers_title_clinched": bool(lead > per_driver),
+        "too_early": bool(rnd < MIN_ROUND_TO_PUBLISH and lead <= per_driver),
         "n_sims": n_sims,
         "drivers": drivers,
         "teams": teams,
     }
 
 
+def _plural(count, word):
+    return f"{count} {word}" if count == 1 else f"{count} {word}s"
+
+
 def render_prediction_block(prediction):
     season, leader = prediction["season"], prediction["drivers"][0]
+    left = _plural(prediction["rounds_remaining"], "round") + " left"
+    if prediction["sprints_remaining"]:
+        left += f" ({_plural(prediction['sprints_remaining'], 'sprint weekend')} among them)"
     lines = [
         f"**{season} season after round {prediction['round']} of "
-        f"{prediction['rounds_total']} ({prediction['event']}).** "
-        f"{prediction['rounds_remaining']} rounds left, of which "
-        f"{prediction['sprints_remaining']} are sprint weekends; a driver can still score at "
-        f"most {prediction['points_still_available']} points.",
+        f"{prediction['rounds_total']} ({prediction['event']}).** {left}; a driver can still "
+        f"score at most {prediction['points_still_available']} points.",
         "",
     ]
+    if prediction["too_early"]:
+        by_points = sorted(prediction["drivers"], key=lambda d: -d["points"])
+        lines += [
+            f"**Too early to call.** Probabilities are published from round "
+            f"{MIN_ROUND_TO_PUBLISH}. Before that the simulation has too few rounds to draw "
+            "on and, replayed on past seasons, it was confidently wrong this early.",
+            "",
+            "| Driver | Team | Points |", "|---|---|---|",
+        ]
+        lines += [f"| {d['driver']} | {d['team']} | {d['points']:.0f} |" for d in by_points[:6]]
+        return "\n".join(lines)
+
     if prediction["drivers_title_clinched"]:
         lines.append(
             f"**{leader['driver']} has won the {season} drivers' championship**: the lead is "
@@ -89,7 +109,8 @@ def render_prediction_block(prediction):
     else:
         lines.append(
             f"The simulation makes {leader['driver']} the favourite at "
-            f"{leader['probability']:.1%}."
+            f"{leader['probability']:.1%}. Read that with the calibration table below in "
+            "mind: the simulation tends to be more confident than it should be."
         )
     lines += ["", "| Driver | Team | Points | Title probability |", "|---|---|---|---|"]
     for d in prediction["drivers"][:6]:
@@ -99,15 +120,15 @@ def render_prediction_block(prediction):
     lines += ["", "| Team | Points | Constructors' title probability |", "|---|---|---|"]
     for t in prediction["teams"][:4]:
         lines.append(f"| {t['team']} | {t['points']:.0f} | {t['probability']:.1%} |")
-    lines += ["", f"From {prediction['n_sims']:,} simulated seasons. Drivers not shown are at "
-                  "or near 0%."]
+    lines += ["", f"From {prediction['n_sims']:,} simulated seasons. Only the top six drivers "
+                  "and top four teams are shown."]
     return "\n".join(lines)
 
 
 def _method_table(summary, header):
     lines = [f"| {header} | Top pick was the champion | Probability given to the champion "
              "| Brier score (lower is better) |", "|---|---|---|---|"]
-    for method in ("simulation", "leader", "lstm"):
+    for method in METHOD_ORDER:
         if method in summary:
             s = summary[method]
             lines.append(f"| {METHOD_NAMES[method]} | {s['accuracy']:.1%} "
@@ -115,36 +136,45 @@ def _method_table(summary, header):
     return lines
 
 
+def _cells(summary, key, fmt):
+    return " | ".join(
+        format(summary[m][key], fmt) if m in summary else "—" for m in METHOD_ORDER
+    )
+
+
 def render_backtest_block(backtest):
     years = backtest["years"]
-    n = backtest["overall"]["simulation"]["n"]
+    header = " | ".join(METHOD_NAMES[m] for m in METHOD_ORDER)
+    rule = "|".join(["---"] * (len(METHOD_ORDER) + 2))
     lines = [
         f"Seasons {years[0]}–{years[-1]}, one prediction after every round from round "
-        f"{backtest['first_round']} to the second-last: {n} predictions per method.",
+        f"{backtest['first_round']} to the second-last: {backtest['n_predictions']} "
+        f"predictions per method. A further {backtest['n_decided_excluded']} rounds where "
+        "the title was already decided by arithmetic are left out, since every method gets "
+        f"those right. The simulation uses {backtest['n_sims']:,} runs per prediction here.",
         "",
         *_method_table(backtest["overall"], "All seasons"),
         "",
-        "By stage of the season (Brier score, lower is better):",
+        "**Is the simulation as sure as it should be?** When its top pick had this much "
+        "probability, this is how often the pick went on to win:",
         "",
-        "| Stage | Predictions | Season simulation | Points leader wins | LSTM classifier |",
-        "|---|---|---|---|---|",
+        "| Simulation's confidence in its pick | Predictions | Average confidence "
+        "| Pick was right |",
+        "|---|---|---|---|",
     ]
+    for band in backtest["calibration"]:
+        lines.append(f"| {band['band']} | {band['n']} | {band['mean_confidence']:.0%} "
+                     f"| {band['share_correct']:.0%} |")
+    lines += ["", "By stage of the season (Brier score, lower is better):", "",
+              f"| Stage | Predictions | {header} |", f"|{rule}|"]
     for stage, summary in backtest["by_stage"].items():
-        lstm = f"{summary['lstm']['brier']:.3f}" if "lstm" in summary else "—"
         lines.append(f"| {stage} | {summary['simulation']['n']} "
-                     f"| {summary['simulation']['brier']:.3f} | {summary['leader']['brier']:.3f} "
-                     f"| {lstm} |")
-    lines += [
-        "",
-        "By season (how often the top pick was the eventual champion):",
-        "",
-        "| Season | Champion | Season simulation | Points leader wins | LSTM classifier |",
-        "|---|---|---|---|---|",
-    ]
+                     f"| {_cells(summary, 'brier', '.3f')} |")
+    lines += ["", "By season (how often the top pick was the eventual champion):", "",
+              f"| Season | Champion | {header} |", f"|{rule}|"]
     for year, summary in backtest["by_season"].items():
-        lstm = f"{summary['lstm']['accuracy']:.0%}" if "lstm" in summary else "—"
-        lines.append(f"| {year} | {summary['champion']} | {summary['simulation']['accuracy']:.0%} "
-                     f"| {summary['leader']['accuracy']:.0%} | {lstm} |")
+        lines.append(f"| {year} | {summary['champion']} "
+                     f"| {_cells(summary, 'accuracy', '.0%')} |")
     return "\n".join(lines)
 
 

@@ -31,6 +31,7 @@ jobs:
 
       - name: Refresh results and re-run the season simulation
         run: |
+          set -o pipefail   # a failed update must fail the step, not be hidden by tee
           python src/update_predictions.py | tee /tmp/update_output.txt
 
       - name: Commit and push changes

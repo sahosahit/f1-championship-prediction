@@ -69,3 +69,17 @@ def test_readme_blocks_match_the_committed_results_files():
         assert read_block(readme, "prediction") == render_prediction_block(json.load(handle))
     with open(BACKTEST_PATH) as handle:
         assert read_block(readme, "backtest") == render_backtest_block(json.load(handle))
+
+
+def test_too_early_in_the_season_no_probabilities_are_published():
+    rows = [(1, "AAA", "Red", 1, 25), (1, "BBB", "Blue", 2, 18)]
+    prediction = build_prediction(_results(rows), _calendar(20), 2030, n_sims=200)
+    assert prediction["too_early"] is True
+    block = render_prediction_block(prediction)
+    assert "too early" in block.lower()
+    assert "%" not in block.split("|", 1)[-1]
+
+
+def test_one_round_left_reads_naturally():
+    prediction = build_prediction(_results(ROWS), _calendar(4), 2030, n_sims=200)
+    assert "1 round left" in render_prediction_block(prediction)

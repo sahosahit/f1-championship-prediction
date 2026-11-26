@@ -7,12 +7,12 @@ This project answers that in two ways and checks both against twelve past season
 - **A season simulation** (the headline model): play out the remaining races thousands of times and count how often each driver and team finishes on top.
 - **An LSTM classifier** (PyTorch), kept as a comparison: a neural network that reads each driver's season so far and outputs a title probability.
 
-The standings are rebuilt every Monday from the official results by a GitHub Action, and the sections marked as generated below are rendered from results files. A test fails if the README and those files disagree.
+The standings are rebuilt every Monday from published race results by a GitHub Action, and the sections marked as generated below are rendered from results files. A test (run in CI) fails if the README and those files disagree.
 
 ## Current prediction
 
 <!-- prediction:start -->
-**2026 season after round 21 of 23 (Las Vegas Grand Prix).** 2 rounds left, of which 0 are sprint weekends; a driver can still score at most 50 points.
+**2026 season after round 21 of 23 (Las Vegas Grand Prix).** 2 rounds left; a driver can still score at most 50 points.
 
 **ANT has won the 2026 drivers' championship**: the lead is larger than the points still available.
 
@@ -32,7 +32,7 @@ The standings are rebuilt every Monday from the official results by a GitHub Act
 | Red Bull | 440 | 0.0% |
 | McLaren | 431 | 0.0% |
 
-From 20,000 simulated seasons. Drivers not shown are at or near 0%.
+From 20,000 simulated seasons. Only the top six drivers and top four teams are shown.
 <!-- prediction:end -->
 
 ![Current prediction](results/2026_prediction.png)
@@ -42,46 +42,57 @@ From 20,000 simulated seasons. Drivers not shown are at or near 0%.
 Each method was replayed through past seasons, using only what was known after each round.
 
 <!-- backtest:start -->
-Seasons 2014–2025, one prediction after every round from round 4 to the second-last: 204 predictions per method.
+Seasons 2014–2025, one prediction after every round from round 4 to the second-last: 181 predictions per method. A further 23 rounds where the title was already decided by arithmetic are left out, since every method gets those right. The simulation uses 5,000 runs per prediction here.
 
 | All seasons | Top pick was the champion | Probability given to the champion | Brier score (lower is better) |
 |---|---|---|---|
-| Season simulation | 75.5% | 74.9% | 0.350 |
-| Points leader wins | 77.0% | 77.0% | 0.461 |
-| LSTM classifier | 59.3% | 49.5% | 0.469 |
+| Season simulation | 72.4% | 71.7% | 0.394 |
+| Points leader, hedged | 74.0% | 60.2% | 0.415 |
+| Points leader, certain | 74.0% | 74.0% | 0.519 |
+| LSTM classifier | 54.1% | 48.0% | 0.489 |
+
+**Is the simulation as sure as it should be?** When its top pick had this much probability, this is how often the pick went on to win:
+
+| Simulation's confidence in its pick | Predictions | Average confidence | Pick was right |
+|---|---|---|---|
+| 50–70% | 33 | 60% | 48% |
+| 70–90% | 40 | 82% | 57% |
+| 90–99% | 35 | 94% | 69% |
+| 99–100% | 73 | 100% | 93% |
 
 By stage of the season (Brier score, lower is better):
 
-| Stage | Predictions | Season simulation | Points leader wins | LSTM classifier |
-|---|---|---|---|---|
-| First third | 45 | 0.457 | 0.622 | 0.598 |
-| Middle third | 83 | 0.483 | 0.675 | 0.492 |
-| Final third | 76 | 0.141 | 0.132 | 0.369 |
+| Stage | Predictions | Season simulation | Points leader, hedged | Points leader, certain | LSTM classifier |
+|---|---|---|---|---|---|
+| First third | 45 | 0.457 | 0.466 | 0.622 | 0.598 |
+| Middle third | 83 | 0.483 | 0.500 | 0.675 | 0.492 |
+| Final third | 53 | 0.202 | 0.237 | 0.189 | 0.391 |
 
 By season (how often the top pick was the eventual champion):
 
-| Season | Champion | Season simulation | Points leader wins | LSTM classifier |
-|---|---|---|---|---|
-| 2014 | HAM | 40% | 40% | 0% |
-| 2015 | HAM | 100% | 100% | 100% |
-| 2016 | ROS | 76% | 76% | 100% |
-| 2017 | HAM | 44% | 44% | 12% |
-| 2018 | HAM | 82% | 82% | 29% |
-| 2019 | HAM | 94% | 94% | 71% |
-| 2020 | HAM | 100% | 100% | 77% |
-| 2021 | VER | 67% | 78% | 28% |
-| 2022 | VER | 89% | 89% | 22% |
-| 2023 | VER | 100% | 100% | 100% |
-| 2024 | VER | 100% | 100% | 100% |
-| 2025 | NOR | 20% | 25% | 65% |
+| Season | Champion | Season simulation | Points leader, hedged | Points leader, certain | LSTM classifier |
+|---|---|---|---|---|---|
+| 2014 | HAM | 40% | 40% | 40% | 0% |
+| 2015 | HAM | 100% | 100% | 100% | 100% |
+| 2016 | ROS | 76% | 76% | 76% | 100% |
+| 2017 | HAM | 36% | 36% | 36% | 0% |
+| 2018 | HAM | 80% | 80% | 80% | 20% |
+| 2019 | HAM | 93% | 93% | 93% | 67% |
+| 2020 | HAM | 100% | 100% | 100% | 70% |
+| 2021 | VER | 67% | 78% | 78% | 28% |
+| 2022 | VER | 86% | 86% | 86% | 0% |
+| 2023 | VER | 100% | 100% | 100% | 100% |
+| 2024 | VER | 100% | 100% | 100% | 100% |
+| 2025 | NOR | 20% | 25% | 25% | 65% |
 <!-- backtest:end -->
 
 **What this shows.**
 
-- The simulation picks the eventual champion about as often as the simplest possible rule, "whoever leads the standings wins". Picking the leader is hard to beat.
-- Where the simulation helps is in how sure it is. The Brier score punishes confident wrong calls, and the simulation scores better than the leader rule because it hedges when the fight is close.
-- The LSTM does worse than both across the full set, even though it was trained on 2014–2024, so those seasons are not new to it. 2025 was used to choose which training run to keep, so it has no season that is completely new to it. Its better showing in 2025 is one season and should not be read as more than that.
-- All three struggle with seasons where the lead changed hands late (2014, 2017, 2021, 2025). Nothing here models car development or form swings.
+- **Picking the champion:** nothing beats the simplest rule, "whoever leads the standings wins". The simulation's top pick is nearly always the leader too, so it is right about as often.
+- **Being appropriately sure:** the fair comparison is the hedged leader rule, which backs the leader only as strongly as that rule has been right in other seasons. The simulation's Brier score is slightly better than that overall and in the first two thirds of a season, and slightly worse in the final third. Twelve seasons is too few to call that a real difference.
+- **The simulation is overconfident.** The calibration table shows it: picks it gave 70–90% went on to win far less often than that, and it has been close to certain about the wrong driver (Leclerc after four rounds of 2022, Piastri late in 2025). Treat its probabilities as too extreme, and treat a 0% as "would need to outscore anything seen so far this season", not as impossible.
+- **The LSTM** picks the champion less often than either leader rule. Its Brier score is better than the certain leader rule and worse than the hedged one and the simulation. It was trained on 2014–2024 and 2025 was used to choose which training run to keep, so none of these seasons is new to it, which makes that comparison generous to it.
+- **Late lead changes beat everything** (2014, 2017, 2021, 2025). Nothing here models car development or swings in form.
 
 **The scores.** "Top pick was the champion" is plain accuracy. "Probability given to the champion" is how much weight the method put on the driver who went on to win. The Brier score is the squared error of the whole probability table: 0 is a perfect call and 2 is a certain wrong one.
 
@@ -89,20 +100,21 @@ By season (how often the top pick was the eventual champion):
 
 Each remaining round is filled in with a round already run this season, drawn at random. Every driver and team gets the points they really scored in the drawn round. Do this for every remaining round, add the points to the current standings, and note who finishes on top. Repeat 20,000 times.
 
-This keeps the result honest in ways a per-driver classifier cannot:
+What this design gets right that a per-driver classifier cannot:
 
 - **Probabilities add up to 100%**, because each simulated season has exactly one champion.
-- **A driver who cannot catch up gets 0%**, because nobody can score more in a simulated round than someone really scored in a round. The README also states the plain arithmetic: once the lead is larger than the points still available, the title is decided.
 - **Points within a round stay consistent.** Whole rounds are drawn, so two drivers cannot both win the same race.
+- **A driver who is out of reach gets 0%**, because nobody can score more in a simulated round than someone really scored in a round this season. Separately from the simulation, the report states the plain arithmetic: once the lead is larger than the points still available under that season's rules, the title is decided.
 - **Sprint weekends are drawn from past sprint weekends** when there are any, because more points are on offer.
 - **Team points follow the team a driver was with at the time**, so mid-season driver changes do not move points between teams.
 
 ### Limitations
 
-- It assumes the rest of the season looks like the season so far. It knows nothing about upgrades, driver changes or which circuits remain.
-- Early in a season there are few rounds to draw from, so it can be overconfident after one team's strong start.
-- Drivers level on points are split at random; the real tie-break is countback on wins.
-- A driver's results are not separated from their car's. A parametric model of driver and car strength would be the next step.
+- **It is overconfident**, as the calibration table shows. Redrawing past rounds cannot produce anything that has not already happened this season, so a driver or team that improves later is invisible to it.
+- **Early in a season it has almost nothing to draw from.** No probabilities are published before round 6; the standings are shown instead.
+- It knows nothing about upgrades, driver changes or which circuits remain.
+- Drivers level on points are split at random, and standings ties are ordered by wins only; the real tie-break is a full countback.
+- A driver's results are not separated from their car's. A model of driver and car strength with proper uncertainty is the next step.
 
 ## The LSTM classifier
 
@@ -139,7 +151,7 @@ python -m src.backtest              # replay 2014–2025 and write results/backt
 python src/train.py                 # retrain the LSTM (optional)
 ```
 
-The prediction service in `api/` (FastAPI, with a Dockerfile) serves the LSTM classifier.
+The prediction service in `api/` (FastAPI, with a Dockerfile) serves the LSTM classifier's raw outputs. It predates the simulation and has not been updated to use it.
 
 ## Project structure
 
@@ -152,7 +164,8 @@ f1-championship-prediction/
 │   ├── backtest.py            # replay past seasons, score each method
 │   ├── report.py              # prediction file and generated README blocks
 │   ├── update_predictions.py  # weekly update entry point
-│   └── model.py, dataset.py, feature_engineering.py, train.py, evaluate.py   # LSTM
+│   ├── points.py              # points available under each season's rules
+│   └── model.py, dataset.py, feature_engineering.py, train.py   # LSTM
 ├── data/                      # results, calendar, standings
 ├── results/                   # prediction.json, backtest.json, charts
 ├── api/                       # FastAPI service for the LSTM
@@ -160,7 +173,7 @@ f1-championship-prediction/
 └── tests/
 ```
 
-The notebook and the constructor LSTM scripts (`train_constructor.py`, `update_constructor_predictions.py`) are from the original LSTM-only version of the project. The constructors' prediction now comes from the same simulation as the drivers'.
+The notebook and the constructor LSTM scripts (`train_constructor.py`, `constructor_feature_engineering.py`) are from the original LSTM-only version of the project and are not part of the weekly update. The constructors' prediction now comes from the same simulation as the drivers'.
 
 ## Future work
 

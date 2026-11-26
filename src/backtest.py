@@ -5,9 +5,16 @@ After every round from round 4 onward of each past season, each method
 says who it thinks will be champion and how sure it is, using only what
 was known at that point. Three methods are compared:
 
-- simulation: the rest-of-season simulation in src.season_simulation;
-- leader:     "whoever leads the standings wins", with full confidence;
-- lstm:       the LSTM classifier, outputs rescaled to sum to 1.
+- simulation:    the rest-of-season simulation in src.season_simulation;
+- leader:        "whoever leads the standings wins", with full confidence;
+- leader_hedged: the same pick, but only as confident as the leader rule
+                 has been right in the other seasons, with the rest of the
+                 probability on second place. This is the fair comparison
+                 for a method that outputs probabilities;
+- lstm:          the LSTM classifier, outputs rescaled to sum to 1.
+
+Rounds where the title was already decided by arithmetic are left out:
+every method gets those right and they would flatter all of them.
 
 The simulation has nothing to train, so every season is new to it. The
 LSTM was trained on 2014-2024 and 2025 was used to choose which training
@@ -27,6 +34,7 @@ from collections import defaultdict
 
 import numpy as np
 
+from .points import max_points_remaining
 from .results_data import load_calendar, load_results
 from .season_simulation import simulate_title
 from .standings import build_standings, round_points, team_round_points
@@ -48,6 +56,38 @@ def brier_score(probabilities, champion):
 def leader_probabilities(points):
     leader = max(points, key=points.get)
     return {name: (1.0 if name == leader else 0.0) for name in points}
+
+
+def hedged_leader_probabilities(points, confidence):
+    """Leader at `confidence`, the rest on whoever is second, everyone else at zero."""
+    ranked = sorted(points, key=points.get, reverse=True)
+    probabilities = {name: 0.0 for name in points}
+    probabilities[ranked[0]] = confidence
+    if len(ranked) > 1:
+        probabilities[ranked[1]] = 1.0 - confidence
+    return probabilities
+
+
+CONFIDENCE_BANDS = (("under 50%", 0.0, 0.5), ("50–70%", 0.5, 0.7), ("70–90%", 0.7, 0.9),
+                    ("90–99%", 0.9, 0.99), ("99–100%", 0.99, 1.0000001))
+
+
+def calibration_table(rows, method):
+    """
+    For one method: when it was this confident in its top pick, how often
+    was the pick right? A well-calibrated method is right about as often as
+    its confidence says.
+    """
+    table = []
+    for band, low, high in CONFIDENCE_BANDS:
+        inside = [r for r in rows if r["method"] == method and low <= r["p_pick"] < high]
+        if inside:
+            table.append({
+                "band": band, "n": len(inside),
+                "mean_confidence": float(np.mean([r["p_pick"] for r in inside])),
+                "share_correct": float(np.mean([r["correct"] for r in inside])),
+            })
+    return table
 
 
 def score(probabilities, champion):
@@ -135,15 +175,26 @@ def run_backtest(years, results=None, calendar=None):
     standings = build_standings(results)
     model = load_lstm()
 
-    rows = []
+    rows, snapshots, decided = [], [], 0
     for year in years:
         season = standings[standings["Year"] == year]
+        sprint = calendar[calendar["Year"] == year].set_index("Round")["IsSprint"]
         total_rounds = int(season["Round"].max())
         final = season[season["Round"] == total_rounds]
         champion = final.sort_values("ChampionshipPosition").iloc[0]["Driver"]
         for rnd in range(FIRST_ROUND, total_rounds):
             now = season[season["Round"] == rnd]
             points = dict(zip(now["Driver"], now["CumulativePoints"]))
+            ranked = sorted(points.values(), reverse=True)
+            left = [r for r in sprint.index if r > rnd]
+            available = max_points_remaining(
+                year, left, [bool(sprint[r]) for r in left], total_rounds)
+            if ranked[0] - ranked[1] > available:
+                decided += 1
+                continue
+            snapshot = {"year": int(year), "round": rnd, "champion": champion,
+                        "stage": stage_of(rnd, total_rounds), "points": points}
+            snapshots.append(snapshot)
             methods = {
                 "simulation": simulation_probabilities(results, calendar, year, rnd)["drivers"],
                 "leader": leader_probabilities(points),
@@ -151,25 +202,41 @@ def run_backtest(years, results=None, calendar=None):
             if model is not None:
                 methods["lstm"] = lstm_probabilities(model, standings, year, rnd, total_rounds)
             for method, probabilities in methods.items():
-                rows.append({"year": int(year), "round": rnd, "method": method,
-                             "stage": stage_of(rnd, total_rounds), "champion": champion,
-                             **score(probabilities, champion)})
+                rows.append(_row(snapshot, method, probabilities))
+
+    # Hedged leader: confidence learned only from the other seasons.
+    leader_rows = [r for r in rows if r["method"] == "leader"]
+    for snapshot in snapshots:
+        others = [r["correct"] for r in leader_rows if r["year"] != snapshot["year"]]
+        confidence = float(np.mean(others))
+        rows.append(_row(snapshot, "leader_hedged",
+                         hedged_leader_probabilities(snapshot["points"], confidence)))
 
     def subset(**conditions):
         return [r for r in rows if all(r[k] == v for k, v in conditions.items())]
 
-    held_out = [r for r in rows if r["year"] > LSTM_TRAINED_THROUGH]
     return {
         "years": [int(y) for y in years],
         "first_round": FIRST_ROUND,
+        "n_sims": BACKTEST_SIMS,
+        "n_predictions": len(snapshots),
+        "n_decided_excluded": decided,
         "lstm_trained_through": LSTM_TRAINED_THROUGH,
         "overall": summarise(rows),
-        "lstm_validation_season": summarise(held_out),
+        "calibration": calibration_table(rows, "simulation"),
         "by_stage": {stage: summarise(subset(stage=stage))
                      for stage in ("First third", "Middle third", "Final third")},
         "by_season": {str(year): {"champion": subset(year=year)[0]["champion"],
-                                  **summarise(subset(year=year))} for year in years},
+                                  **summarise(subset(year=year))}
+                      for year in years if subset(year=year)},
     }
+
+
+def _row(snapshot, method, probabilities):
+    return {"year": snapshot["year"], "round": snapshot["round"], "method": method,
+            "stage": snapshot["stage"], "champion": snapshot["champion"],
+            "p_pick": float(max(probabilities.values())),
+            **score(probabilities, snapshot["champion"])}
 
 
 def main():

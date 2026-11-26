@@ -71,3 +71,49 @@ def test_calendar_marks_sprint_weekends():
         {"Year": 2026, "Round": 1, "EventName": "A", "Date": "2026-03-08", "IsSprint": False},
         {"Year": 2026, "Round": 2, "EventName": "B", "Date": "2026-03-15", "IsSprint": True},
     ]
+
+
+import pandas as pd
+import pytest
+
+from src import results_data
+
+
+def _season(rounds):
+    return pd.DataFrame([{"Year": 2030, "Round": r, "EventName": f"R{r}", "Driver": "AAA",
+                          "Team": "Red", "Position": 1, "Classified": True, "RacePoints": 25.0,
+                          "Status": "Finished", "SprintPoints": 0.0} for r in rounds])
+
+
+def _calendar_frame(n):
+    return pd.DataFrame([{"Year": 2030, "Round": r, "EventName": f"R{r}", "Date": "2030-01-01",
+                          "IsSprint": False} for r in range(1, n + 1)])
+
+
+@pytest.fixture
+def stored(tmp_path, monkeypatch):
+    monkeypatch.setattr(results_data, "RESULTS_PATH", str(tmp_path / "results.csv"))
+    monkeypatch.setattr(results_data, "CALENDAR_PATH", str(tmp_path / "calendar.csv"))
+    monkeypatch.setattr(results_data, "fetch_calendar", lambda year: _calendar_frame(10))
+    monkeypatch.setattr(results_data, "fetch_season", lambda year: _season([1, 2, 3]))
+    results_data.refresh_season(2030)
+    return monkeypatch
+
+
+def test_refresh_replaces_the_season(stored):
+    stored.setattr(results_data, "fetch_season", lambda year: _season([1, 2, 3, 4]))
+    results_data.refresh_season(2030)
+    assert sorted(results_data.load_results()["Round"]) == [1, 2, 3, 4]
+
+
+def test_refresh_refuses_a_response_with_fewer_rounds_than_already_stored(stored):
+    stored.setattr(results_data, "fetch_season", lambda year: _season([1, 2]))
+    with pytest.raises(RuntimeError, match="fewer rounds"):
+        results_data.refresh_season(2030)
+    assert sorted(results_data.load_results()["Round"]) == [1, 2, 3]
+
+
+def test_refresh_refuses_an_empty_response(stored):
+    stored.setattr(results_data, "fetch_season", lambda year: _season([]))
+    with pytest.raises(RuntimeError):
+        results_data.refresh_season(2030)

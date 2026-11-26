@@ -1,5 +1,5 @@
 """
-Official race, sprint and calendar data from the Jolpica API (the successor
+Race, sprint and calendar data from the Jolpica API (the successor
 to Ergast): https://api.jolpi.ca
 
 Everything the project knows about a season is rebuilt from these results,
@@ -124,9 +124,28 @@ def load_calendar():
 
 
 def refresh_season(year):
-    """Replace one season in the stored results and calendar with fresh data."""
-    for path, fresh in ((RESULTS_PATH, fetch_season(year)), (CALENDAR_PATH, fetch_calendar(year))):
+    """
+    Replace one season in the stored results and calendar with fresh data.
+
+    Both downloads finish before anything is written, each file is replaced
+    in one step, and a response that has lost rounds we already hold is
+    refused, so a partial or failed download can never be committed.
+    """
+    fresh_results, fresh_calendar = fetch_season(year), fetch_calendar(year)
+    if fresh_results.empty or fresh_calendar.empty:
+        raise RuntimeError(f"The results API returned no data for {year}.")
+    if os.path.exists(RESULTS_PATH):
+        stored = pd.read_csv(RESULTS_PATH)
+        held = stored.loc[stored["Year"] == year, "Round"].nunique()
+        if fresh_results["Round"].nunique() < held:
+            raise RuntimeError(
+                f"The results API returned fewer rounds for {year} "
+                f"({fresh_results['Round'].nunique()}) than are already stored ({held})."
+            )
+    for path, fresh in ((RESULTS_PATH, fresh_results), (CALENDAR_PATH, fresh_calendar)):
         if os.path.exists(path):
             stored = pd.read_csv(path)
             fresh = pd.concat([stored[stored["Year"] != year], fresh], ignore_index=True)
-        fresh.sort_values(["Year", "Round"], kind="stable").to_csv(path, index=False)
+        temporary = f"{path}.tmp"
+        fresh.sort_values(["Year", "Round"], kind="stable").to_csv(temporary, index=False)
+        os.replace(temporary, path)
